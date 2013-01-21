@@ -6,7 +6,6 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import br.unisinos.swe.agentjs.engine.EngineContext;
 import br.unisinos.swe.agentjs.engine.api.AgentHttpClient;
 
 import android.app.Activity;

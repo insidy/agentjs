@@ -1,22 +1,20 @@
 package br.unisinos.swe.agentjs.engine;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import br.unisinos.swe.agentjs.AndroidAgentJSActivity;
 import br.unisinos.swe.agentjs.engine.api.AgentAPI;
-import br.unisinos.swe.agentjs.engine.api.AgentHttpClient;
 import br.unisinos.swe.agentjs.engine.api.AgentNotification;
-import br.unisinos.swe.agentjs.engine.api.AgentSMS;
 import br.unisinos.swe.agentjs.engine.db.AgentScript;
 import br.unisinos.swe.agentjs.engine.db.AgentScriptManager;
+import br.unisinos.swe.agentjs.engine.signals.ISignalsManager;
+import br.unisinos.swe.agentjs.engine.signals.SignalsManager;
 
 public class Engine {
 
+	private ISignalsManager _signals;
 	private AgentScriptManager _loader;
 	private Context _rhino;
 	private Scriptable _scope;
@@ -24,8 +22,12 @@ public class Engine {
 	private boolean _started = false;
 
 	public Engine(android.content.Context applicationContext) {
-		EngineContext.create(applicationContext, null); // TODO create and start signals manager
+		EngineContext.create(applicationContext);
+		
+		_signals = new SignalsManager();
 		_loader = new AgentScriptManager();
+		
+		EngineContext.setSignalManager(_signals);
 		
 		// setup sandbox
 		EngineScriptSandbox.SandboxClassShutter.addAllowedScriptableComponent(EngineContext.class);
@@ -36,7 +38,8 @@ public class Engine {
 
 	public void start() {
 		if (!_started) {
-
+			
+			_signals.start();
 			
 			_rhino = Context.enter();
 

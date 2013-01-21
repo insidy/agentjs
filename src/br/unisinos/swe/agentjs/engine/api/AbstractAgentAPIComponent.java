@@ -30,7 +30,7 @@ public abstract class AbstractAgentAPIComponent implements IAgentAPIComponent {
 				
 				// register for signaling
 				if(signal != null) {
-					signal.registerListener(new SignalListener(_uuid, _helper, (Function)callbackFunc));
+					signal.registerListener(signalName, new SignalListener(_uuid, _helper, (Function)callbackFunc));
 				}
 			}
 			
@@ -45,7 +45,7 @@ public abstract class AbstractAgentAPIComponent implements IAgentAPIComponent {
 			
 			// register for signaling
 			if(signal != null) {
-				signal.removeListener(_uuid);
+				signal.removeListener(signalName, _uuid);
 			}
 			
 		}

@@ -6,10 +6,6 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 
-import br.unisinos.swe.agentjs.engine.api.AgentAPI;
-import br.unisinos.swe.agentjs.engine.api.AgentHttpClient;
-import br.unisinos.swe.agentjs.engine.api.AgentNotification;
-import br.unisinos.swe.agentjs.engine.api.AgentSMS;
 import br.unisinos.swe.agentjs.engine.api.IAgentAPIComponent;
 
 

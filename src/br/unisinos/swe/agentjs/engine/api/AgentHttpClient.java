@@ -6,24 +6,18 @@ import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.util.EntityUtils;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeObject;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.annotations.JSFunction;
 
+import android.annotation.SuppressLint;
 import br.unisinos.swe.agentjs.engine.AgentComponent;
 import br.unisinos.swe.agentjs.engine.AgentExecutorHelper;
 import br.unisinos.swe.agentjs.engine.wrappers.HttpWrapper;
 import br.unisinos.swe.agentjs.engine.wrappers.IResponseHandler;
 
+@SuppressLint("DefaultLocale")
 @AgentComponent(name="http")
 public class AgentHttpClient extends AbstractAgentAPIComponent implements IResponseHandler {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6314999152919031280L;
 	
 	HttpWrapper _wrapper;
 	
