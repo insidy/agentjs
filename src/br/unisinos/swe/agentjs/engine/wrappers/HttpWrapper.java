@@ -4,9 +4,13 @@ import java.io.IOException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolException;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.EntityEnclosingRequestWrapper;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 
 import br.unisinos.swe.agentjs.engine.EngineContext;
@@ -68,13 +72,16 @@ public class HttpWrapper extends AsyncTask<String, Void, HttpEntity> {
 
 		HttpEntity response = null;
 		try {
-			BasicHttpEntityEnclosingRequest request = new BasicHttpEntityEnclosingRequest(method, url);
+			EntityEnclosingRequestWrapper request = new EntityEnclosingRequestWrapper(new HttpPost(url));
+			request.setMethod(method);
+			
 			if(content != null) {
 				request.setEntity(new StringEntity(content));
 			}
 			
-			HttpResponse httpResponse = this._httpClient.execute(new HttpGet(
-					url));
+			
+			
+			HttpResponse httpResponse = this._httpClient.execute(request);
 
 			response = httpResponse.getEntity();
 
@@ -82,6 +89,9 @@ public class HttpWrapper extends AsyncTask<String, Void, HttpEntity> {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
