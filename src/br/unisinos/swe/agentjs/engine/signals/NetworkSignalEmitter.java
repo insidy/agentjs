@@ -129,8 +129,9 @@ public class NetworkSignalEmitter extends AbstractSignalEmitter {
 
 	@Override
 	public void stop() {
-		EngineContext.instance().getContext()
-				.unregisterReceiver(this._scanResultsReceiver);
+		EngineContext.instance().getContext().unregisterReceiver(this._scanResultsReceiver);
+		EngineContext.instance().getContext().unregisterReceiver(this._networkStateChangedReceiver);
+		EngineContext.instance().getContext().unregisterReceiver(this._wifiStateChangedReceiver);
 	}
 
 }

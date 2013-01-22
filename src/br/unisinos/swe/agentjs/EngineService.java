@@ -1,9 +1,21 @@
 package br.unisinos.swe.agentjs;
 
+import java.io.IOException;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.ParseException;
+import org.apache.http.util.EntityUtils;
+
+import com.google.common.util.concurrent.FutureCallback;
+
 import br.unisinos.swe.agentjs.engine.Engine;
+import br.unisinos.swe.http.utils.HttpQueue;
+import br.unisinos.swe.http.utils.HttpQueueManager;
+import br.unisinos.swe.http.utils.HttpQueueRequest;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
 public class EngineService extends Service {
@@ -75,12 +87,37 @@ public class EngineService extends Service {
 		//start engine on a new thread
 		this._engine.start();
 		
+		//teste de fila http
+        HttpQueue queue = HttpQueueManager.create();
+        queue.fireEnsureCallback(new HttpQueueRequest("GET", "http://www.google.com", null, new FutureCallback<HttpEntity>() {
+			
+			@Override
+			public void onSuccess(HttpEntity arg0) {
+				try {
+					Log.i("OK", EntityUtils.toString(arg0));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable arg0) {
+				Log.e("ERR", "Failed");
+				arg0.printStackTrace();
+			}
+		}));
+		
 		return START_STICKY;
 	}
 
 	@Override
 	public void onDestroy() {
 		// Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
+		this._engine.stop();
 	}
 
 	@Override

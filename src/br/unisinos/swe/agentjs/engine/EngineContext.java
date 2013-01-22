@@ -34,7 +34,7 @@ public class EngineContext {
 	}
 
 	public static EngineContext create(Context appContext) {
-		if(m_instance != null) {
+		if(m_instance == null) {
 			m_instance = new EngineContext(appContext);
 		} // shall we do something if instance is already created?
 		
@@ -43,7 +43,7 @@ public class EngineContext {
 	
 	public static EngineContext setSignalManager(ISignalsManager signalManager) {
 		if(m_instance != null) {
-			if(signalManager != null) {
+			if(signalManager == null) {
 				m_instance._signalsManager = signalManager;
 			}
 		}

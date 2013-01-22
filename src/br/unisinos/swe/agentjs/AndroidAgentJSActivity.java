@@ -1,16 +1,27 @@
 package br.unisinos.swe.agentjs;
 
+import java.io.IOException;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.ParseException;
+import org.apache.http.util.EntityUtils;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import com.google.common.util.concurrent.FutureCallback;
+
 import br.unisinos.swe.agentjs.engine.api.AgentHttpClient;
+import br.unisinos.swe.http.utils.HttpQueue;
+import br.unisinos.swe.http.utils.HttpQueueManager;
+import br.unisinos.swe.http.utils.HttpQueueRequest;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 public class AndroidAgentJSActivity extends Activity {
     /** Called when the activity is first created. */

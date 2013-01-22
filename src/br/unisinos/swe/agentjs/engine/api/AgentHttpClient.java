@@ -64,12 +64,9 @@ public class AgentHttpClient extends AbstractAgentAPIComponent implements IRespo
 		String content = "";
 		try {
 			content = EntityUtils.toString(entity);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			_helper.callback(_errorCallback, content);
+			return;
 		}
 
 		_helper.callback(_successCallback, content);
