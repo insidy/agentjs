@@ -8,7 +8,7 @@ import java.util.UUID;
 public abstract class AbstractSignalEmitter implements ISignalEmitter {
 	protected HashMap<String, List<ISignalListener>> _listeners;
 	protected static AbstractSignalEmitter _instance;
-	protected ArrayList<String> _signals = null;
+	protected static ArrayList<String> _signals = null;
 	
 	protected AbstractSignalEmitter() {
 		_listeners = new HashMap<String, List<ISignalListener>>();
@@ -51,6 +51,11 @@ public abstract class AbstractSignalEmitter implements ISignalEmitter {
 			}
 		}
 		
+	}
+	
+	@Override
+	public List<String> getSignals() {
+		return _signals;
 	}
 
 	public List<ISignalListener> getListeners(String signal) {

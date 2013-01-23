@@ -9,11 +9,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import br.unisinos.swe.agentjs.engine.EngineContext;
+import br.unisinos.swe.agentjs.engine.signals.info.NetworkSignalBasicInfo;
 
 public class NetworkSignalEmitter extends AbstractSignalEmitter {
 
@@ -36,21 +39,21 @@ public class NetworkSignalEmitter extends AbstractSignalEmitter {
 		}
 	}
 
+	protected static final int API_LEVEL_14 = 14;
+
 	private BroadcastReceiver _scanResultsReceiver;
 	private BroadcastReceiver _networkStateChangedReceiver;
 	private BroadcastReceiver _wifiStateChangedReceiver;
 	private WifiManager _wifiManager;
 	
-
-	@Override
-	public List<String> getSignals() {
+	public NetworkSignalEmitter() {
+		super();
 		if(_signals == null) {
 			_signals = new ArrayList<String>();
 			for (NetworkSignal signal : NetworkSignal.class.getEnumConstants()) {
 				_signals.add(signal.toString());
 			}
 		}
-		return _signals;
 	}
 
 	public static ISignalEmitter create() {
@@ -83,19 +86,27 @@ public class NetworkSignalEmitter extends AbstractSignalEmitter {
 		
 		IntentFilter networkStateChangedFilter = new IntentFilter();
 		networkStateChangedFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+		//networkStateChangedFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		this._networkStateChangedReceiver = new BroadcastReceiver() {
 
 			@Override
 			public void onReceive(Context appContext, Intent broadcastIntent) {
-				NetworkInfo networkInfo = broadcastIntent.<NetworkInfo>getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+				NetworkInfo networkInfo = null;
+				WifiInfo wifiInfo = null;
+				if(broadcastIntent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+					networkInfo = broadcastIntent.<NetworkInfo>getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+					
+					if(android.os.Build.VERSION.SDK_INT >= API_LEVEL_14) {
+						wifiInfo = broadcastIntent.<WifiInfo>getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
+					}
+				}
 				//TODO Implement object conversion
+				NetworkSignalBasicInfo basicInfo = new NetworkSignalBasicInfo(networkInfo);
 				
 				if(networkInfo.isConnected()) {
-					
-					WifiInfo wifiInfo = broadcastIntent.<WifiInfo>getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
-					NetworkSignalEmitter.this.fire(NetworkSignal.WIFI_CONNECTED.toString());
+					NetworkSignalEmitter.this.fire(NetworkSignal.WIFI_CONNECTED.toString(), basicInfo);
 				} else {
-					NetworkSignalEmitter.this.fire(NetworkSignal.WIFI_DISCONNECTED.toString());
+					NetworkSignalEmitter.this.fire(NetworkSignal.WIFI_DISCONNECTED.toString(), basicInfo);
 				}
 
 			}
@@ -119,7 +130,6 @@ public class NetworkSignalEmitter extends AbstractSignalEmitter {
 		};
 		
 		
-		
 		EngineContext.instance().getContext().registerReceiver(this._scanResultsReceiver, scanResultFilter);
 		EngineContext.instance().getContext().registerReceiver(this._networkStateChangedReceiver, networkStateChangedFilter);
 		EngineContext.instance().getContext().registerReceiver(this._wifiStateChangedReceiver, wifiStateChangedFilter);
@@ -129,6 +139,7 @@ public class NetworkSignalEmitter extends AbstractSignalEmitter {
 
 	@Override
 	public void stop() {
+		EngineContext.log().info("Stopping NetworkSignalEmitter");
 		EngineContext.instance().getContext().unregisterReceiver(this._scanResultsReceiver);
 		EngineContext.instance().getContext().unregisterReceiver(this._networkStateChangedReceiver);
 		EngineContext.instance().getContext().unregisterReceiver(this._wifiStateChangedReceiver);

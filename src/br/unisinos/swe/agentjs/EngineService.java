@@ -73,7 +73,7 @@ public class EngineService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, "AgentJS Engine starting", Toast.LENGTH_SHORT).show();
 
 		// For each start request, send a message to start a job and deliver the
 		// start ID so we know which request we're stopping when we finish the
@@ -87,14 +87,18 @@ public class EngineService extends Service {
 		//start engine on a new thread
 		this._engine.start();
 		
+		
 		//teste de fila http
         HttpQueue queue = HttpQueueManager.create();
+        
         queue.fireEnsureCallback(new HttpQueueRequest("GET", "http://www.google.com", null, new FutureCallback<HttpEntity>() {
 			
 			@Override
 			public void onSuccess(HttpEntity arg0) {
 				try {
+					Log.i("OK", "R1");
 					Log.i("OK", EntityUtils.toString(arg0));
+					Log.i("OK", "R1");
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -106,7 +110,7 @@ public class EngineService extends Service {
 			
 			@Override
 			public void onFailure(Throwable arg0) {
-				Log.e("ERR", "Failed");
+				Log.e("ERR", "Failed R1");
 				arg0.printStackTrace();
 			}
 		}));

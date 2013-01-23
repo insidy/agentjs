@@ -22,7 +22,13 @@ public class SignalListener implements ISignalListener {
 	}
 	
 	public void fire(Object... params) {
-		_helper.callback(_callback, params);
+		Object[] jsParams = new Object[params.length];
+		
+		for(int idx = 0; idx < params.length; idx++) {
+			jsParams[idx] = _helper.javaToJS(params[idx]);
+		}
+		
+		_helper.callback(_callback, jsParams);
 	}
 	
 	public boolean equals(Object obj) {

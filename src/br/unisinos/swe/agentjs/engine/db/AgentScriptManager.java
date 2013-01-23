@@ -32,6 +32,11 @@ public class AgentScriptManager {
 		
 		scripts.add(newScript);
 		
+		newScript = new AgentScript();
+		newScript.setSourceCode("var log = Packages.br.unisinos.swe.agentjs.engine.EngineLogger.i; log('network: ' + agent.network); agent.network.on('wifi:connected', function(data) { log('conectou'); });");
+		
+		scripts.add(newScript);
+		
 		return scripts;
 	}
 

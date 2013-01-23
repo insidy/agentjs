@@ -1,10 +1,7 @@
 package br.unisinos.swe.http.utils;
 
-import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -15,9 +12,9 @@ import android.content.Context;
 import br.unisinos.swe.agentjs.engine.EngineContext;
 import br.unisinos.swe.agentjs.engine.EngineUtils;
 
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListenableFutureTask;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
@@ -26,11 +23,14 @@ public class HttpQueue {
 	
 	private static final int DEFAULT_THREADS = 1;
 
+	protected static final String TAG = "HttpQueue";
+
 	protected ListeningExecutorService _executorService;
 	
-	protected LinkedBlockingQueue _executionQueue;
+	protected LinkedBlockingQueue<Runnable> _executionQueue;
 	protected LinkedList<HttpQueueCallable> _networkwaitingQueue;
 	
+	protected int _maxthreads;
 	protected int _threads;
 	protected UUID _uuid;
 	
@@ -41,32 +41,35 @@ public class HttpQueue {
 		this(DEFAULT_THREADS);
 	}
 	
-	protected HttpQueue(String strUUID) {
-		
-	}
-	
 	protected HttpQueue(int maxthreads) {
 		_uuid = UUID.randomUUID();
 		_threads = DEFAULT_THREADS;
-		_executorService = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
+		_maxthreads = maxthreads;
+		//_executorService = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
 		
-		_executionQueue = new LinkedBlockingQueue();
+		_executionQueue = new LinkedBlockingQueue<Runnable>();
 		_networkwaitingQueue = new LinkedList<HttpQueueCallable>();
-		_executorService = MoreExecutors.listeningDecorator(new ThreadPoolExecutor(_threads, maxthreads, 15, TimeUnit.SECONDS, _executionQueue));
-
+		startExecutorService();
 	}
 	
+	private void startExecutorService() {
+		_executorService = MoreExecutors.listeningDecorator(new ThreadPoolExecutor(_threads, _maxthreads, 15, TimeUnit.SECONDS, _executionQueue));
+		if(HttpQueueManager.isConnected()) {
+			_waitingForNetwork = false;
+		} else {
+			waitForNetwork();
+		}
+		
+	}
+
 	public void fireEnsureDelivery(HttpQueueRequest request) {
 		HttpQueueCallable callable = new HttpQueueCallable(request, this);
 		callable.ensureDelivery();
 		
-		if(_waitingForNetwork) {
-			_networkwaitingQueue.push(callable);
+		if(isHalted()) {
+			_networkwaitingQueue.addLast(callable);
 		} else {
-			ListenableFuture<HttpEntity> futureTask = _executorService.submit(callable);
-			if(request.getCallback() != null) {
-				Futures.addCallback(futureTask, request.getCallback());
-			}
+			addCallableToQueue(callable);
 		}
 	}
 	
@@ -74,39 +77,54 @@ public class HttpQueue {
 		HttpQueueCallable callable = new HttpQueueCallable(request, this);
 		callable.ensureCallback();
 		
-		if(_waitingForNetwork) {
-			_networkwaitingQueue.push(callable);
+		if(isHalted()) {
+			_networkwaitingQueue.addLast(callable);
 		} else {
-			ListenableFuture<HttpEntity> futureTask = _executorService.submit(callable);
-			if(request.getCallback() != null) {
-				Futures.addCallback(futureTask, request.getCallback());
-			}
+			addCallableToQueue(callable);
 		}
 	}
 	
 	public void haltAndWaitForNetwork(HttpQueueCallable failedRequest) {
-		_waitingForNetwork = true;
-		_executorService.shutdownNow();
-		_networkwaitingQueue.push(failedRequest);
-	
-	
-		Object queueItem = null;
-		while((queueItem = _executionQueue.poll()) != null) {
-			_networkwaitingQueue.push((HttpQueueCallable)queueItem);
+		
+		if(this.isHalted()) {
+			_networkwaitingQueue.addLast(failedRequest); // just add and wait
+			
+		} else {
+			if(!HttpQueueManager.isConnected()) {
+				waitForNetwork();
+				
+				_networkwaitingQueue.addLast(failedRequest);
+				
+			} else {
+				addCallableToQueue(failedRequest);
+			}
 		}
+	}
+
+	private void waitForNetwork() {
+		_waitingForNetwork = true;
 		HttpQueueManager.haltQueue(this);
 	}
 
 	public void wakeUp() {
-		_waitingForNetwork = false;
+		startExecutorService();
 		HttpQueueCallable callable = null;
 		while((callable = _networkwaitingQueue.poll()) != null) {
 			
-			ListenableFuture<HttpEntity> futureTask = _executorService.submit(callable);
-			if(callable.getRequest().getCallback() != null) {
-				Futures.addCallback(futureTask, callable.getRequest().getCallback());
-			}
+			addCallableToQueue(callable);
+			
 		}
+	}
+
+	private void addCallableToQueue(HttpQueueCallable callable) {
+		ListenableFuture<HttpEntity> futureTask = _executorService.submit(callable);
+		if(callable.getRequest().getCallback() != null) {
+			Futures.addCallback(futureTask, callable.getRequest().getCallback());
+		}
+	}
+
+	public boolean isHalted() {
+		return _waitingForNetwork;
 	}
 
 	public String getUserAgent() { // User Agent for HTTP call

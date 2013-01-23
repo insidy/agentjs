@@ -25,6 +25,8 @@ public class HttpQueueCallable implements Callable<HttpEntity> {
 	protected HttpQueueRequest _request;
 	protected HttpQueue _parentQueue;
 	
+	protected int _unknownHostCount = 0;
+	
 	public HttpQueueCallable(HttpQueueRequest request, HttpQueue parent) {
 		_request = request;
 		_parentQueue = parent;
@@ -35,7 +37,12 @@ public class HttpQueueCallable implements Callable<HttpEntity> {
 	}
 
 	@Override
-	public HttpEntity call() throws Exception {
+	public HttpEntity call() throws ConnectivityLostException, Exception {
+		if(_parentQueue.isHalted()) {
+			_parentQueue.haltAndWaitForNetwork(this);
+			throw new ConnectivityLostException("Network unavailable, will retry as soon as possible");
+		}
+		
 		AndroidHttpClient httpClient = AndroidHttpClient.newInstance(_parentQueue.getUserAgent(), _parentQueue.getContext());
 		HttpConnectionParams.setConnectionTimeout(httpClient.getParams(), 20000);
 		HttpConnectionParams.setSoTimeout(httpClient.getParams(), 45000);
@@ -53,9 +60,9 @@ public class HttpQueueCallable implements Callable<HttpEntity> {
 		}
 		
 		if(error != null) {
-			if(error.getClass().equals(UnknownHostException.class)) {
+			if(error.getClass().equals(UnknownHostException.class) && _unknownHostCount++ < 2) {
 				_parentQueue.haltAndWaitForNetwork(this);
-				throw new Exception("Network unavailable, will retry as soon as possible");
+				throw new ConnectivityLostException("Network unavailable, will retry as soon as possible");
 			} else {
 				throw error;
 			}

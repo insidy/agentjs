@@ -43,7 +43,7 @@ public class EngineContext {
 	
 	public static EngineContext setSignalManager(ISignalsManager signalManager) {
 		if(m_instance != null) {
-			if(signalManager == null) {
+			if(m_instance._signalsManager == null) {
 				m_instance._signalsManager = signalManager;
 			}
 		}

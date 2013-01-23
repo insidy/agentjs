@@ -16,6 +16,7 @@ public class AgentAPI {
 	AgentSMS _sms;
 	AgentApplications _apps;
 	AgentSound _sound;
+	AgentNetwork _network;
 	
 	public AgentAPI(AgentExecutorHelper helper) {
 		_helper = helper;
@@ -24,6 +25,7 @@ public class AgentAPI {
 		_sms = new AgentSMS(_helper);
 		_apps = new AgentApplications(_helper);
 		_sound = new AgentSound(_helper);
+		_network = new AgentNetwork(_helper);
 		
 	}
 	
@@ -45,6 +47,11 @@ public class AgentAPI {
 	@JSGetter("sms")
 	public final AgentSMS getSms() {
 		return this._sms;
+	}
+	
+	@JSGetter("network")
+	public final AgentNetwork getNetwork() {
+		return this._network;
 	}
 	
 	@JSFunction("createNotification")

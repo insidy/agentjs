@@ -26,7 +26,12 @@ public class AgentExecutor extends AsyncTask<Void, Void, Void> {
 		
 		_engine.createAPI(_rhino, _scope);
 		
-		_rhino.evaluateString(_scope, _script.getSourceCode(), "ScriptAPI", 1, null);
+		try {
+			_rhino.evaluateString(_scope, _script.getSourceCode(), "ScriptAPI", 1, null);
+		} catch(Exception agentException) {
+			agentException.printStackTrace();
+			EngineContext.log().error("Agent caused an exception");
+		}
 		Context.exit();
 		
 		return null;
