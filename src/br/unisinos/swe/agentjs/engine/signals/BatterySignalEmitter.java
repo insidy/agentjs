@@ -1,6 +1,6 @@
 package br.unisinos.swe.agentjs.engine.signals;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import br.unisinos.swe.agentjs.engine.EngineContext;
 
@@ -36,6 +36,7 @@ public class BatterySignalEmitter extends AbstractSignalEmitter {
 	     public void onReceive(Context context, Intent intent) {
 	    	 Intent batteryStatus = EngineContext.instance().getContext().registerReceiver(null, _batteryStatusFilter);
 	    	 
+	    	 //TODO fix battery signal
 	    	 // Get Extras:
 	    	 //http://developer.android.com/reference/android/os/BatteryManager.html
 	    	 
@@ -43,11 +44,15 @@ public class BatterySignalEmitter extends AbstractSignalEmitter {
 	    	 
 	     }
 	}
-
-	@Override
-	public List<String> getSignals() {
-		// TODO Auto-generated method stub
-		return null;
+	
+	public BatterySignalEmitter() {
+		super();
+		if(_signals == null) {
+			_signals = new ArrayList<String>();
+			for (BatterySignal signal : BatterySignal.class.getEnumConstants()) {
+				_signals.add(signal.toString());
+			}
+		}
 	}
 
 	@Override

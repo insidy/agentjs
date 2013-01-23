@@ -17,6 +17,7 @@ public class AgentScriptManager {
 		
 		scripts.add(newScript);
 		
+		//TODO: Get source from DB / folder
 		newScript = new AgentScript();
 		newScript.setSourceCode("var log = Packages.br.unisinos.swe.agentjs.engine.EngineLogger.i; var notif = agent.createNotification('teste'); notif.content = 'opa!'; notif.send(); log('pronto');");
 		

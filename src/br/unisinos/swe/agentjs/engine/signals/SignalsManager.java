@@ -35,7 +35,6 @@ public class SignalsManager implements ISignalsManager {
 
 	@Override
 	public void stop() {
-		// TODO Auto-generated method stub
 		for(ISignalEmitter emitter : _globalEmitters) {
 			emitter.stop();
 		}

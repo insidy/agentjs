@@ -54,6 +54,7 @@ public class EngineService extends Service {
 	
 	@Override
 	public void onCreate() {
+		super.onCreate();
 		/*
 		 * // Start up the thread running the service. Note that we create a //
 		 * separate thread because the service normally runs in the process's //
@@ -100,10 +101,8 @@ public class EngineService extends Service {
 					Log.i("OK", EntityUtils.toString(arg0));
 					Log.i("OK", "R1");
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -120,6 +119,7 @@ public class EngineService extends Service {
 
 	@Override
 	public void onDestroy() {
+		super.onDestroy();
 		// Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
 		this._engine.stop();
 	}

@@ -68,7 +68,6 @@ public class AgentSound extends AbstractAgentAPIComponent {
 
 	@Override
 	protected boolean isOwnSignal(String signal) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 }

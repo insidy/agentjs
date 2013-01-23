@@ -22,16 +22,42 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 public class AndroidAgentJSActivity extends Activity {
+	
+	protected Intent _serviceIntent;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        Intent intent = new Intent(this, EngineService.class);
-        startService(intent);
+        
+        _serviceIntent = new Intent(this, EngineService.class);
+        
+        Button btnStart = (Button)findViewById(R.id.btnStartService);
+        Button btnStop = (Button)findViewById(R.id.btnStopService);
+        
+        btnStart.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				_serviceIntent = new Intent(AndroidAgentJSActivity.this, EngineService.class);
+				startService(_serviceIntent);
+			}
+		});
+        
+        btnStop.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				stopService(_serviceIntent);
+			}
+		});
+        
+        
         
         //EngineContext.create(this.getApplicationContext());
         //runScript();

@@ -88,7 +88,7 @@ public class HttpQueueManager {
 			HttpURLConnection urlConnection = null;
 			
 			try {
-				url = new URL("http://m.google.com"); // Fixed internet connection check based on m.google.com (TODO: Allow intranet requests)
+				url = new URL("http://m.google.com"); // Fixed internet connection check based on m.google.com | TODO: Allow intranet requests
 				urlConnection = (HttpURLConnection) url.openConnection();
 				if(urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
 					connected = true;

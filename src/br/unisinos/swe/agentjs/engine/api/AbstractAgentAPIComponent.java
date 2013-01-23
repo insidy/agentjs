@@ -1,5 +1,6 @@
 package br.unisinos.swe.agentjs.engine.api;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import org.mozilla.javascript.Function;
@@ -12,6 +13,7 @@ import br.unisinos.swe.agentjs.engine.signals.SignalListener;
 
 public abstract class AbstractAgentAPIComponent implements IAgentAPIComponent {
 	
+	protected ArrayList<String> _signals = null;
 	protected AgentExecutorHelper _helper;
 	protected UUID _uuid;
 	
