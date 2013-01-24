@@ -1,2 +1,4 @@
 bin/
 .DS_Store
+
+gen/br/unisinos/swe/agentjs/R.java
