@@ -1,9 +1,6 @@
 package br.unisinos.swe.agentjs.engine.api;
 
-import java.io.IOException;
-
 import org.apache.http.HttpEntity;
-import org.apache.http.ParseException;
 import org.apache.http.util.EntityUtils;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeObject;
