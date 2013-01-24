@@ -38,6 +38,17 @@ public class AgentScriptManager {
 		
 		scripts.add(newScript);
 		
+		newScript = new AgentScript();
+		newScript.setSourceCode("var log = Packages.br.unisinos.swe.agentjs.engine.EngineLogger.i; log('application: ' + agent.apps); var installedApps = agent.apps.getInstalledApps(); for(var i = 0; i < installedApps.length; i++){ log(installedApps[i].packageName); } ");
+		
+		scripts.add(newScript);
+		
+		newScript = new AgentScript();
+		newScript.setSourceCode("agent.apps.launchAppByPackage('com.android.contacts');");
+		
+		scripts.add(newScript);
+		
+		
 		return scripts;
 	}
 

@@ -6,6 +6,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 
+import android.content.pm.ApplicationInfo;
 import br.unisinos.swe.agentjs.engine.api.IAgentAPIComponent;
 
 
@@ -50,7 +51,12 @@ public class AgentExecutorHelper {
 	}
 
 	public Object javaToJS(Object toConvert) {
+		EngineScriptSandbox.SandboxClassShutter.addAllowedScriptableComponent(toConvert.getClass()); // TODO: If we are converting, we want to expose, right?		
 		return Context.javaToJS(toConvert, _scope);
+	}
+	
+	public Scriptable newArray(Object[] elements) {
+		return _rhino.newArray(_scope, elements);
 	}
 
 }

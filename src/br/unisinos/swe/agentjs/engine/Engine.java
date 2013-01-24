@@ -68,6 +68,7 @@ public class Engine {
 	}
 
 	public void createAPI(Context rhino, Scriptable scope) {
+		EngineScriptSandbox.SandboxClassShutter.addAllowedScriptableComponent(String.class);
 		EngineScriptSandbox.SandboxClassShutter.addAllowedScriptableComponent(AgentNotification.class); // manual allowed, other added by Helper
 		EngineScriptSandbox.SandboxClassShutter.addAllowedScriptableComponent(AgentAPI.class);
 		
