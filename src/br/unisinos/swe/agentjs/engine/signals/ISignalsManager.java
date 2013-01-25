@@ -1,8 +1,8 @@
 package br.unisinos.swe.agentjs.engine.signals;
 
-public interface ISignalsManager {
+import br.unisinos.swe.agentjs.engine.IEngineComponent;
+
+public interface ISignalsManager extends IEngineComponent {
 
 	public ISignalEmitter search(String name);
-	public void start();
-	public void stop();
 }

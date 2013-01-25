@@ -1,33 +1,51 @@
 package br.unisinos.swe.agentjs.engine;
 
+import java.util.ArrayList;
+
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+import android.app.Service;
 import br.unisinos.swe.agentjs.engine.api.AgentAPI;
 import br.unisinos.swe.agentjs.engine.api.AgentNotification;
 import br.unisinos.swe.agentjs.engine.db.AgentScript;
 import br.unisinos.swe.agentjs.engine.db.AgentScriptManager;
 import br.unisinos.swe.agentjs.engine.signals.ISignalsManager;
 import br.unisinos.swe.agentjs.engine.signals.SignalsManager;
+import br.unisinos.swe.agentjs.engine.upnp.UPnPHandler;
 
 public class Engine {
 
-	private ISignalsManager _signals;
-	private AgentScriptManager _loader;
+	//private ISignalsManager _signals;
+	//private AgentScriptManager _loader;
+	
+	// Engine Components
+	private ArrayList<IEngineComponent> _components;
+	
+	// Mozilla Rhino references
 	private Context _rhino;
 	private Scriptable _scope;
 
+	// Engine state
 	private boolean _started = false;
 
-	public Engine(android.content.Context applicationContext) {
-		EngineContext.create(applicationContext);
+	/**
+	 * Create a new AgentJS engine
+	 * @param applicationContext
+	 */
+	public Engine(Service engineService) {
+		EngineContext.create(engineService.getApplicationContext());
 		
-		_signals = new SignalsManager();
-		_loader = new AgentScriptManager();
+		_components = new ArrayList<IEngineComponent>();
 		
-		EngineContext.setSignalManager(_signals);
+		// initiate components
+		_components.add((ISignalsManager)new SignalsManager());
+		_components.add((IAgentScriptManager)new AgentScriptManager(new UPnPHandler(engineService)));
+		
+		// define global signal manager
+		EngineContext.setSignalManager(get(ISignalsManager.class));
 		
 		// setup sandbox
 		EngineScriptSandbox.SandboxClassShutter.addAllowedScriptableComponent(EngineContext.class);
@@ -35,11 +53,25 @@ public class Engine {
 		
 		ContextFactory.initGlobal(new EngineScriptSandbox());
 	}
+	
+	private final <U> U get(Class<U> clsType) {
+		for(Object component : _components) {
+			if(clsType.isInstance(component)) {
+				return clsType.cast(component);
+			}
+		}
+		return null;
+	}
 
 	public void start() {
 		if (!_started) {
 			
-			_signals.start();
+			//_signals.start();
+			//_loader.start();
+			
+			for(IEngineComponent component : _components) {
+				component.start();
+			}
 			
 			_rhino = Context.enter();
 
@@ -54,20 +86,35 @@ public class Engine {
 		}
 	}
 
+	public void stop() {
+		_started = false;
+		for(IEngineComponent component : _components) {
+			component.start();
+		}
+		Context.exit();
+	}
+	
+	public ArrayList<AgentScript> getLocalScripts() {
+		return get(IAgentScriptManager.class).getLocalScripts();
+	}
+	
+	public ArrayList<AgentScript> getNetworkScripts() {
+		return get(IAgentScriptManager.class).getNetworkScripts();
+	}
+	
+	public void startScript(AgentScript script) {
+		get(IAgentScriptManager.class).startScript(this, script);
+	}
+	
 	private void loadLocalScripts(Context rhino, Scriptable scope) {
-		for(AgentScript script : _loader.getLocalScripts()) {
+		for(AgentScript script : get(IAgentScriptManager.class).getLocalScripts()) {
 			// new thread + create API's 
 			AgentExecutor executor = new AgentExecutor(this, script);
 			executor.execute();
 		}
 	}
 
-	public void stop() {
-		_started = false;
-		Context.exit();
-	}
-
-	public void createAPI(Context rhino, Scriptable scope) {
+	protected void createAPI(Context rhino, Scriptable scope) {
 		EngineScriptSandbox.SandboxClassShutter.addAllowedScriptableComponent(String.class);
 		EngineScriptSandbox.SandboxClassShutter.addAllowedScriptableComponent(AgentNotification.class); // manual allowed, other added by Helper
 		EngineScriptSandbox.SandboxClassShutter.addAllowedScriptableComponent(AgentAPI.class);
@@ -78,7 +125,7 @@ public class Engine {
 		ScriptableObject.putProperty(scope, "agent", Context.javaToJS(api, scope));
 	}
 	
-	public Scriptable scope(Context ctx) {
+	protected Scriptable scope(Context ctx) {
 		Scriptable newScope = ctx.newObject(_scope);
 	    newScope.setPrototype(_scope);
 	    newScope.setParentScope(null);
@@ -86,7 +133,7 @@ public class Engine {
 	    return newScope;
 	}
 	
-	public Context context() {
+	protected Context context() {
 		return _rhino;
 	}
 

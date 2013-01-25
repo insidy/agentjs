@@ -2,7 +2,9 @@ package br.unisinos.swe.agentjs.engine.signals;
 
 import java.util.HashSet;
 
-public class SignalsManager implements ISignalsManager {
+import br.unisinos.swe.agentjs.engine.IEngineComponent;
+
+public class SignalsManager implements ISignalsManager, IEngineComponent {
 	
 	private HashSet<ISignalEmitter> _globalEmitters;
 

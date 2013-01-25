@@ -14,13 +14,17 @@ import br.unisinos.swe.http.utils.HttpQueueManager;
 import br.unisinos.swe.http.utils.HttpQueueRequest;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.util.Log;
 import android.widget.Toast;
 
 public class EngineService extends Service {
 
 	private Engine _engine;
+	private final EngineBinder _binder = new EngineBinder();
 	
 	/*
 	private Looper mServiceLooper;
@@ -68,7 +72,7 @@ public class EngineService extends Service {
 		 * ServiceHandler(mServiceLooper);
 		 */
 		
-		this._engine = new Engine(this.getApplicationContext());
+		this._engine = new Engine(this);
 		
 	}
 
@@ -118,7 +122,15 @@ public class EngineService extends Service {
 		}));
         */
 		
-		return START_STICKY;
+		/**
+		 * Service.START_STICKY is used for services which are explicit started or stopped. 
+		 * If these services are terminated by the Android system, they are restarted if sufficient resource are available again.
+		 * Services started with Service.START_NOT_STICKY are not automatically restarted if terminated by the Android system.
+		 */
+		
+		
+		return Service.START_NOT_STICKY;
+		//return START_STICKY;
 	}
 
 	@Override
@@ -128,9 +140,23 @@ public class EngineService extends Service {
 		this._engine.stop();
 	}
 
+	/**
+	 * Currently we will only run in the same process as AgentJS Activity, therefore we don't need to handle things through IPC
+	 */
+	public class EngineBinder extends Binder {
+		EngineService getService() {
+			return EngineService.this;
+		}
+	}
+	
+	
 	@Override
-	public IBinder onBind(Intent arg0) {
-		return null;
+	public IBinder onBind(Intent intent) {
+		return _binder;
+	}
+	
+	public Engine getEngine() {
+		return this._engine;
 	}
 
 }
