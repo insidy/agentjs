@@ -65,6 +65,7 @@ public class AgentApplications extends AbstractAgentAPIComponent {
 		
 		
 		return _helper.newArray(jsArray);
+		//return _helper.javaToJS(jsArray);
 	}
 	
 	@JSFunction("findAppByName")

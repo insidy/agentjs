@@ -30,6 +30,9 @@ public class SignalsManager implements ISignalsManager {
 	public void start() {
 		// instantiate signals
 		register(NetworkSignalEmitter.create());
+		register(AppDispatcherSignalEmitter.create());
+		register(BatterySignalEmitter.create());
+		register(SmsSignalEmitter.create());
 		
 	}
 

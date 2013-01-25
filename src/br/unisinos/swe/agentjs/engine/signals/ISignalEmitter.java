@@ -10,4 +10,5 @@ public interface ISignalEmitter {
 	public List<String> getSignals();
 	public ISignalEmitter start();
 	public void stop();
+	public boolean filter(String signal, ISignalListener listener, Object... params);
 }

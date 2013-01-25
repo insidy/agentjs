@@ -55,10 +55,7 @@ public class NetworkSignalEmitter extends AbstractSignalEmitter {
 	}
 
 	public static ISignalEmitter create() {
-		if (_instance == null) {
-			_instance = new NetworkSignalEmitter();
-		}
-		return _instance;
+		return new NetworkSignalEmitter();
 	}
 
 	@Override
@@ -141,6 +138,11 @@ public class NetworkSignalEmitter extends AbstractSignalEmitter {
 		EngineContext.instance().getContext().unregisterReceiver(this._scanResultsReceiver);
 		EngineContext.instance().getContext().unregisterReceiver(this._networkStateChangedReceiver);
 		EngineContext.instance().getContext().unregisterReceiver(this._wifiStateChangedReceiver);
+	}
+
+	@Override
+	public boolean filter(String signal, ISignalListener listener, Object...params) {
+		return true; // no filter available
 	}
 
 }

@@ -1,10 +1,13 @@
 package br.unisinos.swe.agentjs.engine.api;
 
+import java.util.ArrayList;
+
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.annotations.JSFunction;
 
 import br.unisinos.swe.agentjs.engine.AgentExecutorHelper;
+import br.unisinos.swe.agentjs.engine.signals.SmsSignalEmitter.SmsSignal;
 
 import android.telephony.SmsManager;
 
@@ -36,6 +39,13 @@ public class AgentSMS extends AbstractAgentAPIComponent {
 
 	@Override
 	protected boolean isOwnSignal(String signal) {
-		return false;
+		if(_signals == null) { // signal list is only useful for multi-origin signal API
+			_signals = new ArrayList<String>();
+			for (SmsSignal signalEnum : SmsSignal.class.getEnumConstants()) { // All sms signals
+				_signals.add(signalEnum.toString());
+			}
+		}
+		
+		return _signals.contains(signal);
 	}
 }

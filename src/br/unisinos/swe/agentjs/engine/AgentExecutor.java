@@ -25,6 +25,7 @@ public class AgentExecutor extends AsyncTask<Void, Void, Void> {
 		_scope = _engine.scope(_rhino);
 		
 		_engine.createAPI(_rhino, _scope);
+		//_engine.createAPI(_engine.context(), _scope);
 		
 		try {
 			_rhino.evaluateString(_scope, _script.getSourceCode(), "ScriptAPI", 1, null);

@@ -74,4 +74,9 @@ public class SignalListener implements ISignalListener {
 	public String getParam(String key) {
 		return _jsParams.get(key);
 	}
+
+	@Override
+	public boolean hasParams() {
+		return (_jsParams.size() > 0);
+	}
 }

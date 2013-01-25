@@ -8,4 +8,5 @@ public interface ISignalListener {
 	public UUID getUuid();
 	public HashMap<String, String> getParams();
 	public String getParam(String key);
+	public boolean hasParams();
 }

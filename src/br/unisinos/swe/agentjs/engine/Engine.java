@@ -85,5 +85,9 @@ public class Engine {
 	    
 	    return newScope;
 	}
+	
+	public Context context() {
+		return _rhino;
+	}
 
 }

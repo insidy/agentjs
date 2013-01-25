@@ -90,6 +90,9 @@ public class EngineService extends Service {
 		
 		
 		//teste de fila http
+		/*
+        
+        // TODO : make QueueManager HTTP calls on other thread
         HttpQueue queue = HttpQueueManager.create();
         
         queue.fireEnsureCallback(new HttpQueueRequest("GET", "http://www.google.com", null, new FutureCallback<HttpEntity>() {
@@ -113,6 +116,7 @@ public class EngineService extends Service {
 				arg0.printStackTrace();
 			}
 		}));
+        */
 		
 		return START_STICKY;
 	}

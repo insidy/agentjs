@@ -5,6 +5,7 @@ import org.mozilla.javascript.annotations.JSGetter;
 
 import br.unisinos.swe.agentjs.engine.AgentComponent;
 import br.unisinos.swe.agentjs.engine.AgentExecutorHelper;
+import br.unisinos.swe.agentjs.engine.EngineContext;
 
 @AgentComponent(name="agent")
 public class AgentAPI {
@@ -57,5 +58,10 @@ public class AgentAPI {
 	@JSFunction("createNotification")
 	public final Object createNotification(String title) {
 		return _helper.javaToJS(new AgentNotification(title));
+	}
+	
+	@JSFunction("log")
+	public final void log(String message) {
+		EngineContext.log().info(message);
 	}
 }

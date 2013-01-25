@@ -3,9 +3,7 @@ package br.unisinos.swe.agentjs.engine.signals;
 import java.util.ArrayList;
 
 import br.unisinos.swe.agentjs.engine.EngineContext;
-import br.unisinos.swe.agentjs.engine.signals.NetworkSignalEmitter.NetworkSignal;
 import br.unisinos.swe.agentjs.engine.signals.info.BatterySignalInfo;
-import br.unisinos.swe.agentjs.engine.signals.info.NetworkSignalBasicInfo;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -13,9 +11,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.SystemClock;
 
 public class BatterySignalEmitter extends AbstractSignalEmitter {
@@ -68,6 +63,10 @@ public class BatterySignalEmitter extends AbstractSignalEmitter {
 				_signals.add(signal.toString());
 			}
 		}
+	}
+
+	public static ISignalEmitter create() {
+		return new BatterySignalEmitter();
 	}
 
 	@Override
@@ -135,6 +134,11 @@ public class BatterySignalEmitter extends AbstractSignalEmitter {
 		EngineContext.instance().getContext().unregisterReceiver(this._batteryStatusLowReceiver);
 		EngineContext.instance().getContext().unregisterReceiver(this._batteryAcOnReceiver);
 		EngineContext.instance().getContext().unregisterReceiver(this._batteryAcOffReceiver);
+	}
+
+	@Override
+	public boolean filter(String signal, ISignalListener listener, Object...params) {
+		return true; // no filter available
 	}
 
 }

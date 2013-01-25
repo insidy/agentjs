@@ -39,10 +39,7 @@ public class AppDispatcherSignalEmitter extends AbstractSignalEmitter {
 	}
 
 	public static ISignalEmitter create() {
-		if (_instance == null) {
-			_instance = new AppDispatcherSignalEmitter();
-		}
-		return _instance;
+		return new AppDispatcherSignalEmitter();
 	}
 
 	@Override
@@ -71,6 +68,11 @@ public class AppDispatcherSignalEmitter extends AbstractSignalEmitter {
 	@Override
 	public void stop() {
 		EngineContext.instance().getContext().unregisterReceiver(this._appDispatcherReceiver);
+	}
+
+	@Override
+	public boolean filter(String signal, ISignalListener listener, Object...params) {
+		return true; // no filter available
 	}
 
 }

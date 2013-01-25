@@ -7,8 +7,7 @@ import java.util.UUID;
 
 public abstract class AbstractSignalEmitter implements ISignalEmitter {
 	protected HashMap<String, List<ISignalListener>> _listeners;
-	protected static AbstractSignalEmitter _instance;
-	protected static ArrayList<String> _signals = null;
+	protected ArrayList<String> _signals = null;
 	
 	protected AbstractSignalEmitter() {
 		_listeners = new HashMap<String, List<ISignalListener>>();
@@ -46,7 +45,16 @@ public abstract class AbstractSignalEmitter implements ISignalEmitter {
 		if (this.getSignals().contains(signalString)) {
 			if (_listeners.containsKey(signalString)) {
 				for(ISignalListener listener : getListeners(signalString)) { // multi-thread this?
-					listener.fire(params);
+					
+					if(listener.hasParams() && params.length > 0) { // listener have parameter and we are returning something
+						if(this.filter(signalString, listener, params)) {
+							listener.fire(params);
+						}
+						
+					} else { // common scenario
+						listener.fire(params);
+					}
+					
 				}
 			}
 		}
