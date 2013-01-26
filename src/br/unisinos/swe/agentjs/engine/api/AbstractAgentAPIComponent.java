@@ -44,12 +44,13 @@ public abstract class AbstractAgentAPIComponent implements IAgentAPIComponent {
 	}*/
 	
 	@JSFunction("on")
-	public void on(String signalName, Object callbackFunc) {
-		this.on(signalName, null, callbackFunc);
+	public String on(String signalName, Object callbackFunc) {
+		return this.on(signalName, null, callbackFunc);
 	}
 	
 	@JSFunction("on")
-	public void on(String signalName, Object objParams, Object callbackFunc) {
+	public String on(String signalName, Object objParams, Object callbackFunc) {
+		UUID listenerId = null;
 		if(isOwnSignal(signalName)) {
 			if(callbackFunc != null && callbackFunc instanceof Function) {
 				// Search for signal class
@@ -62,23 +63,38 @@ public abstract class AbstractAgentAPIComponent implements IAgentAPIComponent {
 						jsParams = (NativeObject)objParams;
 					}
 					
-					signal.registerListener(signalName, new SignalListener(_uuid, _helper, (Function)callbackFunc, jsParams));
+					listenerId = UUID.randomUUID();
+					
+					//TODO: Allow multiple uuid (by returning a new id to caller agent)
+					// off should use this id to remove one listener, or none to remove all
+					// infer all by using parent (that is, this _uuid) uuid
+					signal.registerListener(signalName, new SignalListener(listenerId, _uuid, _helper, (Function)callbackFunc, jsParams));
 					
 				}
 			}			
 		}
+		return (listenerId == null ? "" : listenerId.toString());
+	}
+	
+	@JSFunction("off")
+	public void off(String signalName) {
+		off(signalName, null);
 	}
 	
 	
 	@JSFunction("off")
-	public void off(String signalName) {
+	public void off(String signalName, String strListenerId) {
 		if(isOwnSignal(signalName)) {
 			// Search for signal class
 			ISignalEmitter signal = EngineContext.instance().signals().search(signalName);
 			
 			// register for signaling
 			if(signal != null) {
-				signal.removeListener(signalName, _uuid);
+				UUID listenerId = null;
+				if(strListenerId != null) {
+					listenerId = UUID.fromString(strListenerId);
+				}
+				signal.removeListener(signalName, listenerId, _uuid);
 			}
 			
 		}

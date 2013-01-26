@@ -13,6 +13,16 @@ public class SignalsManager implements ISignalsManager, IEngineComponent {
 	}
 	
 	@Override
+	public final <U> U get(Class<U> clsType) {
+		for(Object component : _globalEmitters) {
+			if(clsType.isInstance(component)) {
+				return clsType.cast(component);
+			}
+		}
+		return null;
+	}
+	
+	@Override
 	public ISignalEmitter search(String name) {
 		
 		for(ISignalEmitter emitter : _globalEmitters) {

@@ -1,5 +1,7 @@
 package br.unisinos.swe.agentjs.engine.signals.info;
 
+import org.mozilla.javascript.annotations.JSFunction;
+
 import android.content.Intent;
 import android.os.BatteryManager;
 
@@ -23,10 +25,12 @@ public class BatterySignalInfo {
 		_scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, 0);
 	}
 
+	@JSFunction("isPlugged")
 	public boolean isPlugged() {
 		return (_plugged > 0);
 	}
 
+	@JSFunction("getPowerSource")
 	public String getPowerSource() {
 		switch (_plugged) {
 		case BatteryManager.BATTERY_PLUGGED_AC:
@@ -38,10 +42,12 @@ public class BatterySignalInfo {
 		}
 	}
 
+	@JSFunction("getBatteryLevel")
 	public String getBatteryLevel() {
 		return String.valueOf((100 * _level / _scale));
 	}
 
+	@JSFunction("getStatus")
 	public String getStatus() {
 		switch (_status) {
 		case BatteryManager.BATTERY_STATUS_CHARGING:

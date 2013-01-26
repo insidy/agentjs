@@ -19,6 +19,11 @@ public class AgentSMS extends AbstractAgentAPIComponent {
 	}
 	
 	@JSFunction("send")
+	public void send(NativeObject requestParams) {
+		send(requestParams, null);
+	}
+	
+	@JSFunction("send")
 	public void send(NativeObject requestParams, Object callbackFunc) {
 		String destination = (String) Context.jsToJava(requestParams.get("destination", requestParams), String.class);
 		String message = (String) Context.jsToJava(requestParams.get("message", requestParams), String.class);

@@ -10,6 +10,7 @@ import org.mozilla.javascript.NativeObject;
 import br.unisinos.swe.agentjs.engine.AgentExecutorHelper;
 
 public class SignalListener implements ISignalListener {
+	protected UUID _parentId;
 	protected UUID _uuid;
 	private AgentExecutorHelper _helper;
 	private Function _callback;
@@ -19,8 +20,9 @@ public class SignalListener implements ISignalListener {
 		_uuid = uuid;
 	}
 	
-	public SignalListener(UUID uuid, AgentExecutorHelper helper, Function callback, NativeObject jsParams) {
+	public SignalListener(UUID uuid, UUID parentId, AgentExecutorHelper helper, Function callback, NativeObject jsParams) {
 		_uuid = uuid;
+		_parentId = parentId;
 		_helper = helper;
 		_callback = callback;
 		_jsParams = new HashMap<String, String>();
@@ -78,5 +80,10 @@ public class SignalListener implements ISignalListener {
 	@Override
 	public boolean hasParams() {
 		return (_jsParams.size() > 0);
+	}
+
+	@Override
+	public UUID getParentId() {
+		return this._parentId;
 	}
 }

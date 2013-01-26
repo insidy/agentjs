@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public interface ISignalEmitter {
 	public void registerListener(String signal, ISignalListener listener);
-	public void removeListener(String signal, UUID listenerId);
+	public List<ISignalListener> removeListener(String signal, UUID listenerId, UUID parentId);
 	public void fire(String signal, Object...params);
 	public List<String> getSignals();
 	public ISignalEmitter start();

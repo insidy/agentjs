@@ -28,16 +28,24 @@ public abstract class AbstractSignalEmitter implements ISignalEmitter {
 	}
 
 	@Override
-	public void removeListener(String signalString, UUID listenerId) {
+	public List<ISignalListener> removeListener(String signalString, UUID listenerId, UUID parentId) {
+		List<ISignalListener> removeListeners = new ArrayList<ISignalListener>();
 		if (this.getSignals().contains(signalString)) {
 			if (_listeners.containsKey(signalString)) {
 				List<ISignalListener> signalListeners = getListeners(signalString);
-				SignalListener listenerObj = new SignalListener(listenerId);
-				while (signalListeners.remove(listenerObj)) {
-					// remove all listeners with same UUID
+				
+				for(ISignalListener listener : signalListeners) {
+					if(listenerId != null && listener.getUuid().equals(listenerId)) { // remove when listener ID was specified
+						removeListeners.add(listener);
+					} else if(parentId != null && listener.getParentId().equals(parentId)) { // remove all based on parent id
+						removeListeners.add(listener);
+					}
 				}
+				
+				signalListeners.removeAll(removeListeners);
 			}
 		}
+		return removeListeners;
 	}
 
 	@Override
@@ -68,6 +76,23 @@ public abstract class AbstractSignalEmitter implements ISignalEmitter {
 
 	public List<ISignalListener> getListeners(String signal) {
 		return _listeners.get(signal);
+	}
+
+	public ISignalListener getListenerBySignalAndId(String strSignal, String strListenerId) {
+		ISignalListener listener = null;
+		
+		if (this.getSignals().contains(strSignal)) {
+			if (_listeners.containsKey(strSignal)) {
+				List<ISignalListener> signalListeners = getListeners(strSignal);
+				for(ISignalListener availableListener : signalListeners) {
+					if(availableListener.getUuid().toString().equals(strListenerId)) {
+						return availableListener;
+					}
+				}
+			}
+		}
+		
+		return listener;
 	}
 
 }
