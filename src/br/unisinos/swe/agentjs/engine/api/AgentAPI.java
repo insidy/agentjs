@@ -18,6 +18,7 @@ public class AgentAPI {
 	AgentApplications _apps;
 	AgentSound _sound;
 	AgentNetwork _network;
+	AgentLocation _location;
 	
 	public AgentAPI(AgentExecutorHelper helper) {
 		_helper = helper;
@@ -27,6 +28,7 @@ public class AgentAPI {
 		_apps = new AgentApplications(_helper);
 		_sound = new AgentSound(_helper);
 		_network = new AgentNetwork(_helper);
+		_location = new AgentLocation(_helper);
 		
 	}
 	
@@ -53,6 +55,11 @@ public class AgentAPI {
 	@JSGetter("network")
 	public final AgentNetwork getNetwork() {
 		return this._network;
+	}
+	
+	@JSGetter("location")
+	public final AgentLocation getLocation() {
+		return this._location;
 	}
 	
 	@JSFunction("createNotification")

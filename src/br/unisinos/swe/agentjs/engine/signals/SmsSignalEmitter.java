@@ -47,7 +47,6 @@ public class SmsSignalEmitter extends AbstractSignalEmitter {
 
 	@Override
 	public ISignalEmitter start() {
-		EngineContext.log().info("Starting SMS signal emitter");
 		
 		IntentFilter incomingSmsFilter = new IntentFilter();
 		incomingSmsFilter.addAction("android.provider.Telephony.SMS_RECEIVED");

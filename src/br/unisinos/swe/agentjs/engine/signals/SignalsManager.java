@@ -2,6 +2,7 @@ package br.unisinos.swe.agentjs.engine.signals;
 
 import java.util.HashSet;
 
+import br.unisinos.swe.agentjs.engine.EngineContext;
 import br.unisinos.swe.agentjs.engine.IEngineComponent;
 
 public class SignalsManager implements ISignalsManager, IEngineComponent {
@@ -35,6 +36,7 @@ public class SignalsManager implements ISignalsManager, IEngineComponent {
 	}
 	
 	protected void register(ISignalEmitter emitter) {
+		EngineContext.log().debug("Starting signal: " + emitter.getClass().getName());
 		_globalEmitters.add(emitter.start());
 	}
 
@@ -45,6 +47,7 @@ public class SignalsManager implements ISignalsManager, IEngineComponent {
 		register(AppDispatcherSignalEmitter.create());
 		register(BatterySignalEmitter.create());
 		register(SmsSignalEmitter.create());
+		register(LocationSignalEmitter.create());
 		
 	}
 

@@ -1,6 +1,5 @@
 package br.unisinos.swe.agentjs.engine.signals.info;
 
-import org.mozilla.javascript.annotations.JSFunction;
 import org.mozilla.javascript.annotations.JSGetter;
 
 import android.location.Location;
@@ -60,6 +59,15 @@ public class LocationSignalInfo {
 			accuracy = _location.getAccuracy();
 		}
 		return accuracy;
+	}
+	
+	@JSGetter("speed")
+	public float getSpeed(){
+		float speed = 0.0F;
+		if(_location != null) {
+			speed = _location.getSpeed();
+		}
+		return speed;
 	}
 
 }

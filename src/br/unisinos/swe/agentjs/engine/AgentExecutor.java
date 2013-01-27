@@ -5,6 +5,7 @@ import org.mozilla.javascript.Scriptable;
 
 import br.unisinos.swe.agentjs.engine.db.AgentScript;
 import android.os.AsyncTask;
+import android.os.Looper;
 
 public class AgentExecutor extends AsyncTask<Void, Void, Void> {
 
@@ -21,6 +22,7 @@ public class AgentExecutor extends AsyncTask<Void, Void, Void> {
 
 	@Override
 	protected Void doInBackground(Void... arg0) {
+		Looper.prepare();
 		_rhino = Context.enter();
 		_scope = _engine.scope(_rhino);
 		
@@ -35,6 +37,7 @@ public class AgentExecutor extends AsyncTask<Void, Void, Void> {
 		}
 		Context.exit();
 		
+		Looper.loop();
 		return null;
 	}
 	
