@@ -88,13 +88,16 @@ public class HttpQueueManager {
 			HttpURLConnection urlConnection = null;
 			
 			try {
+				//TODO: must do this async or will raise network on main thread exception
+				/*
 				url = new URL("http://m.google.com"); // Fixed internet connection check based on m.google.com | TODO: Allow intranet requests
 				urlConnection = (HttpURLConnection) url.openConnection();
 				if(urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
 					connected = true;
-				}
+				}*/
+				connected = true;
 				
-			} catch (IOException e) {
+			//} catch (IOException e) {
 				
 			} finally {
 				if(urlConnection != null) {

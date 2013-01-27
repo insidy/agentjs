@@ -15,6 +15,8 @@ import org.apache.http.impl.client.EntityEnclosingRequestWrapper;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.message.BasicHttpRequest;
 
+import br.unisinos.swe.agentjs.engine.EngineContext;
+
 import com.google.common.util.concurrent.FutureCallback;
 
 import android.net.Uri;
@@ -47,9 +49,23 @@ public class HttpQueueRequest {
 		
 		return request;
 	}
+	
+	public String getContent() {
+		return this._content;
+	}
+	
+	public String getMethod() {
+		return this._method;
+	}
+	
+	public String getUrl() {
+		return this._url;
+	}
 
 	public HttpHost getHost() {
 		Uri uri = Uri.parse(_url);
+		int port = uri.getPort();
+		
 		return new HttpHost(uri.getHost(), uri.getPort());
 	}
 	

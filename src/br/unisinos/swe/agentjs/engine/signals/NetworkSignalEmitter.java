@@ -15,6 +15,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import br.unisinos.swe.agentjs.engine.EngineContext;
 import br.unisinos.swe.agentjs.engine.signals.info.NetworkSignalBasicInfo;
+import br.unisinos.swe.agentjs.engine.signals.info.WifiSignalBasicInfo;
 
 public class NetworkSignalEmitter extends AbstractSignalEmitter {
 
@@ -93,13 +94,18 @@ public class NetworkSignalEmitter extends AbstractSignalEmitter {
 					
 					if(android.os.Build.VERSION.SDK_INT >= API_LEVEL_14) {
 						wifiInfo = broadcastIntent.<WifiInfo>getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
+					} else {
+						wifiInfo = _wifiManager.getConnectionInfo();
 					}
 				}
 				//TODO Implement object conversion
 				NetworkSignalBasicInfo basicInfo = new NetworkSignalBasicInfo(networkInfo);
 				
+				WifiSignalBasicInfo wifBasicInfo = new WifiSignalBasicInfo(wifiInfo);
+				
+				
 				if(networkInfo.isConnected()) {
-					NetworkSignalEmitter.this.fire(NetworkSignal.WIFI_CONNECTED.toString(), basicInfo);
+					NetworkSignalEmitter.this.fire(NetworkSignal.WIFI_CONNECTED.toString(), basicInfo, wifBasicInfo);
 				} else {
 					NetworkSignalEmitter.this.fire(NetworkSignal.WIFI_DISCONNECTED.toString(), basicInfo);
 				}
