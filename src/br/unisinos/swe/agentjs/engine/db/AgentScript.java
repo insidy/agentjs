@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import br.unisinos.swe.agentjs.engine.AgentExecutor;
 import br.unisinos.swe.agentjs.engine.upnp.DeviceWrapper;
 
 public class AgentScript {
@@ -13,10 +14,24 @@ public class AgentScript {
 		OWN, NETWORK;
 	}
 	
+	public static enum AgentScriptState {
+		NOT_RUNNING(-1),
+		RUNNING(1),
+		WAITING_CALLBACK(2),
+		DONE(3);
+		
+		private AgentScriptState(int n) { value = n; }        
+	    public final int value;
+	}
+	
+	
+	
 	protected String _id = "";
 	protected String _name = "";
 	protected String _sourceCode = "";
 	protected String _origin = "";
+	private AgentScriptState _executeState = AgentScriptState.NOT_RUNNING;
+	private AgentExecutor executor = null;
 	
 	protected AgentScriptLocation _type;
 
@@ -44,6 +59,10 @@ public class AgentScript {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void setStarted() {
+		this._executeState = AgentScriptState.RUNNING;
 	}
 
 	public void setSourceCode(String _sourceCode) {
@@ -104,6 +123,14 @@ public class AgentScript {
 	
 	public AgentScriptLocation getType() {
 		return _type;
+	}
+
+	public boolean isRunning() {
+		return _executeState != AgentScriptState.NOT_RUNNING;
+	}
+
+	public void setFinished() {
+		_executeState = AgentScriptState.DONE;
 	}
 
 }

@@ -23,7 +23,7 @@ import android.widget.Toast;
 
 public class EngineService extends Service {
 
-	private Engine _engine;
+	private Engine _engine = null;
 	private final EngineBinder _binder = new EngineBinder();
 	
 	/*
@@ -72,7 +72,9 @@ public class EngineService extends Service {
 		 * ServiceHandler(mServiceLooper);
 		 */
 		
-		this._engine = new Engine(this);
+		if(this._engine == null) {
+			this._engine = new Engine(this);
+		}
 		
 	}
 
@@ -144,7 +146,7 @@ public class EngineService extends Service {
 	 * Currently we will only run in the same process as AgentJS Activity, therefore we don't need to handle things through IPC
 	 */
 	public class EngineBinder extends Binder {
-		EngineService getService() {
+		public EngineService getService() {
 			return EngineService.this;
 		}
 	}
@@ -152,8 +154,15 @@ public class EngineService extends Service {
 	
 	@Override
 	public IBinder onBind(Intent intent) {
+		Log.i("EngineContext", "onBind");
 		return _binder;
 	}
+	
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return false;
+    }
 	
 	public Engine getEngine() {
 		return this._engine;

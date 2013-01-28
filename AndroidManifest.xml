@@ -26,6 +26,8 @@
             android:name=".EngineService" />
         
         
+        <activity android:name=".LocalAgentsActivity" />
+        <activity android:name=".NetworkAgentsActivity" />
         
         <activity
             android:name=".AndroidAgentJSActivity"

@@ -12,6 +12,7 @@ import br.unisinos.swe.agentjs.engine.api.AgentAPI;
 import br.unisinos.swe.agentjs.engine.api.AgentNotification;
 import br.unisinos.swe.agentjs.engine.db.AgentScript;
 import br.unisinos.swe.agentjs.engine.db.AgentScriptManager;
+import br.unisinos.swe.agentjs.engine.db.IAgentChangeEvent;
 import br.unisinos.swe.agentjs.engine.signals.ISignalsManager;
 import br.unisinos.swe.agentjs.engine.signals.SignalsManager;
 import br.unisinos.swe.agentjs.engine.upnp.UPnPHandler;
@@ -30,6 +31,7 @@ public class Engine {
 
 	// Engine state
 	private boolean _started = false;
+	private Service _service;
 
 	/**
 	 * Create a new AgentJS engine
@@ -38,6 +40,7 @@ public class Engine {
 	public Engine(Service engineService) {
 		EngineContext.create(engineService.getApplicationContext());
 		
+		_service = engineService;
 		_components = new ArrayList<IEngineComponent>();
 		
 		// initiate components
@@ -80,7 +83,7 @@ public class Engine {
 			// We are creating the API's one for each script.. maybe we could share this later
 			//createAPI(_rhino, _scope);
 			
-			loadLocalScripts(_rhino, _scope);
+			//loadLocalScripts(_rhino, _scope);
 
 			_started = true;
 		}
@@ -89,7 +92,7 @@ public class Engine {
 	public void stop() {
 		_started = false;
 		for(IEngineComponent component : _components) {
-			component.start();
+			component.stop();
 		}
 		Context.exit();
 	}
@@ -106,13 +109,22 @@ public class Engine {
 		get(IAgentScriptManager.class).startScript(this, script);
 	}
 	
+	public void registerAgentListener(IAgentChangeEvent eventListener) {
+		get(IAgentScriptManager.class).registerListener(eventListener);
+	}
+	
+	public void removeAgentListener(IAgentChangeEvent eventListener) {
+		get(IAgentScriptManager.class).removeListener(eventListener);
+	}
+	
+	/*
 	private void loadLocalScripts(Context rhino, Scriptable scope) {
 		for(AgentScript script : get(IAgentScriptManager.class).getLocalScripts()) {
 			// new thread + create API's 
 			AgentExecutor executor = new AgentExecutor(this, script);
 			executor.execute();
 		}
-	}
+	}*/
 
 	protected void createAPI(Context rhino, Scriptable scope) {
 		EngineScriptSandbox.SandboxClassShutter.addAllowedScriptableComponent(String.class);

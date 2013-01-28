@@ -23,6 +23,7 @@ import org.teleal.cling.model.types.UDAServiceType;
 import org.teleal.cling.registry.DefaultRegistryListener;
 import org.teleal.cling.registry.Registry;
 
+import br.unisinos.swe.agentjs.engine.EngineContext;
 import br.unisinos.swe.agentjs.engine.db.AgentNetworkScript;
 import br.unisinos.swe.agentjs.engine.db.AgentScript;
 
@@ -106,7 +107,7 @@ public class UPnPHandler extends DefaultRegistryListener implements IAgentUPnPHa
 	
 	@Override
     public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device) {
-        deviceAdded(device);
+        //deviceAdded(device);
     }
 
     @Override
@@ -154,6 +155,10 @@ public class UPnPHandler extends DefaultRegistryListener implements IAgentUPnPHa
 		if(_upnpService != null) {
 			Service service = wrapper.getDevice().findService(upnpAgentService);
 			Action getAgentListAction = service.getAction("GetAgentList");
+			if(getAgentListAction == null) {
+				EngineContext.log().error("Agent list action not found");
+				return;
+			}
 			
 			ActionInvocation getAgentListInvocation = new ActionInvocation(getAgentListAction);
 			ActionCallback getAgentListCallback = new ActionCallback(getAgentListInvocation) {
@@ -162,7 +167,7 @@ public class UPnPHandler extends DefaultRegistryListener implements IAgentUPnPHa
 				public void success(ActionInvocation invocation) {
 					List<AgentScript> scripts = new ArrayList<AgentScript>();
 					
-					ActionArgumentValue agents = invocation.getOutput("agents");
+					ActionArgumentValue agents = invocation.getOutput("Agents");
 					if(agents != null) {
 						if(agents.getDatatype().getBuiltin() == Datatype.Builtin.STRING) {
 							String encodedJsonArray = String.valueOf(agents.getValue());
@@ -215,7 +220,7 @@ public class UPnPHandler extends DefaultRegistryListener implements IAgentUPnPHa
 				public void success(ActionInvocation invocation) {
 					AgentScript networkScript = null;
 					
-					ActionArgumentValue agents = invocation.getOutput("agent");
+					ActionArgumentValue agents = invocation.getOutput("Agent");
 					if(agents != null) {
 						if(agents.getDatatype().getBuiltin() == Datatype.Builtin.STRING) {
 							String encodedJsonArray = String.valueOf(agents.getValue());

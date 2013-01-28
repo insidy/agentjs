@@ -20,6 +20,7 @@ import br.unisinos.swe.agentjs.engine.upnp.IAgentUPnPHandler;
 
 import android.annotation.SuppressLint;
 import android.os.Environment;
+import android.os.Handler;
 
 @SuppressLint("DefaultLocale")
 public class AgentScriptManager implements IAgentUPnPListener, IAgentScriptManager {
@@ -30,12 +31,15 @@ public class AgentScriptManager implements IAgentUPnPListener, IAgentScriptManag
 	private ArrayList<AgentScript> _localScripts;
 	private HashMap<DeviceWrapper, ArrayList<AgentScript>> _networkScripts;
 	private IAgentUPnPHandler _upnp;
+	
+	private List<IAgentChangeEvent> _agentStateListeners; // inform them about any changes in agent list
 
 	public AgentScriptManager(IAgentUPnPHandler upnp) {
 		_upnp = upnp;
 		
 		_localScripts = new ArrayList<AgentScript>();
 		_networkScripts = new HashMap<DeviceWrapper, ArrayList<AgentScript>>();
+		_agentStateListeners = new ArrayList<IAgentChangeEvent>();
 		
 		rootDir = new File(Environment.getExternalStorageDirectory().toString()
 				+ AGENTS_PATH);
@@ -100,6 +104,7 @@ public class AgentScriptManager implements IAgentUPnPListener, IAgentScriptManag
 								"unable to read agent source code");
 						e.printStackTrace();
 					}
+					newScript.setName(agentScriptFile.getName());
 					newScript.setSourceCode(agentSourceCode.toString());
 					scripts.add(newScript);
 				}
@@ -115,7 +120,6 @@ public class AgentScriptManager implements IAgentUPnPListener, IAgentScriptManag
 	 */
 	@Override
 	public ArrayList<AgentScript> getNetworkScripts() {
-		
 		ArrayList<AgentScript> scripts = new ArrayList<AgentScript>();
 		for(DeviceWrapper device : _networkScripts.keySet()) {
 			scripts.addAll(_networkScripts.get(device));
@@ -136,7 +140,12 @@ public class AgentScriptManager implements IAgentUPnPListener, IAgentScriptManag
 
 	@Override
 	public void deviceRemoved(DeviceWrapper deviceWrapper) {
-		_networkScripts.remove(deviceWrapper);
+		List<AgentScript> removedScripts = _networkScripts.remove(deviceWrapper);
+		if(removedScripts != null) {
+			for(AgentScript script : removedScripts) {
+				informRemoveAgent(script);
+			}
+		}
 	}
 
 	@Override
@@ -151,13 +160,25 @@ public class AgentScriptManager implements IAgentUPnPListener, IAgentScriptManag
 
 	@Override
 	public void connected() {
+		ArrayList<AgentScript> removeScripts = new ArrayList<AgentScript>();
+		for(DeviceWrapper device : _networkScripts.keySet()) {
+			removeScripts.addAll(_networkScripts.get(device));
+		}
+		
+		for(AgentScript scripts : removeScripts) {
+			informRemoveAgent(scripts);
+		}
+		
 		_networkScripts.clear();
 	}
 
 	@Override
 	public void setAvailableAgents(DeviceWrapper device, List<AgentScript> agents) {
-		if(!_networkScripts.containsKey(device)) {
+		if(_networkScripts.containsKey(device)) {
 			_networkScripts.get(device).addAll(agents);
+			for(AgentScript script : agents) {
+				informAddAgent(script);
+			}
 		}
 	}
 	
@@ -186,10 +207,23 @@ public class AgentScriptManager implements IAgentUPnPListener, IAgentScriptManag
 	}
 	
 	@Override
-	public void startScript(Engine engine, AgentScript script) {
+	public void startScript(final Engine engine, final AgentScript script) {
 		if(script.hasSource()) {
-			AgentExecutor executor = new AgentExecutor(engine, script);
-			executor.execute();
+			script.setStarted();
+			informChangeAgent(script);
+			
+			Handler mainHandler = new Handler(EngineContext.instance().getContext().getMainLooper());
+
+			Runnable scriptRunnable = new Runnable() {
+				
+				@Override
+				public void run() {
+					AgentExecutor executor = new AgentExecutor(engine, script);
+					executor.execute();
+				}
+			};
+			mainHandler.post(scriptRunnable);
+			
 		} else { // delayed/network start
 			if(script instanceof AgentNetworkScript) {
 				DeviceWrapper device = ((AgentNetworkScript)script).getDeviceWrapper();
@@ -201,6 +235,34 @@ public class AgentScriptManager implements IAgentUPnPListener, IAgentScriptManag
 				_upnp.getSourceCode(device, currentScript.getId(), this);
 			}
 		}
+	}
+	
+	public void informAddAgent(AgentScript script) {
+		for(IAgentChangeEvent event : _agentStateListeners) {
+			event.addAgent(script);
+		}
+	}
+	
+	public void informRemoveAgent(AgentScript script) {
+		for(IAgentChangeEvent event : _agentStateListeners) {
+			event.removeAgent(script);
+		}
+	}
+	
+	public void informChangeAgent(AgentScript script) {
+		for(IAgentChangeEvent event : _agentStateListeners) {
+			event.agentStateChanged(script);
+		}
+	}
+
+	@Override
+	public void registerListener(IAgentChangeEvent listener) {
+		_agentStateListeners.add(listener);
+	}
+
+	@Override
+	public void removeListener(IAgentChangeEvent listener) {
+		_agentStateListeners.remove(listener);
 	}
 
 }

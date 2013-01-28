@@ -22,12 +22,11 @@ public class AgentExecutor extends AsyncTask<Void, Void, Void> {
 
 	@Override
 	protected Void doInBackground(Void... arg0) {
-		Looper.prepare();
+		//Looper.prepare();
 		_rhino = Context.enter();
 		_scope = _engine.scope(_rhino);
 		
 		_engine.createAPI(_rhino, _scope);
-		//_engine.createAPI(_engine.context(), _scope);
 		
 		try {
 			_rhino.evaluateString(_scope, _script.getSourceCode(), "ScriptAPI", 1, null);
@@ -37,12 +36,14 @@ public class AgentExecutor extends AsyncTask<Void, Void, Void> {
 		}
 		Context.exit();
 		
-		Looper.loop();
+		// The line below will keep the thread running, and will avoid other async threads to run (since it is a queue)
+		//Looper.loop(); 
 		return null;
 	}
 	
 	@Override
 	protected void onPostExecute(Void result) {
+		_script.setFinished();
 	}
 	
 
