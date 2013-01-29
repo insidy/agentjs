@@ -150,5 +150,9 @@ public class NetworkSignalEmitter extends AbstractSignalEmitter {
 	public boolean filter(String signal, ISignalListener listener, Object...params) {
 		return true; // no filter available
 	}
+	
+	public WifiSignalBasicInfo getWifiInfo() {
+		return new WifiSignalBasicInfo(_wifiManager.getConnectionInfo());
+	}
 
 }

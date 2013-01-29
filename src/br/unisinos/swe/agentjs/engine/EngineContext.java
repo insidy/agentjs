@@ -51,4 +51,8 @@ public class EngineContext {
 		return m_instance;
 	}
 
+	public String getCloudUrl() { //TODO: Change to Shared parameters
+		return "http://127.0.0.1:8080/";
+	}
+
 }

@@ -1,5 +1,6 @@
 package br.unisinos.swe.agentjs.engine.signals.info;
 
+import org.json.JSONObject;
 import org.mozilla.javascript.annotations.JSGetter;
 
 import android.location.Location;
@@ -68,6 +69,11 @@ public class LocationSignalInfo {
 			speed = _location.getSpeed();
 		}
 		return speed;
+	}
+
+	public JSONObject toJson() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

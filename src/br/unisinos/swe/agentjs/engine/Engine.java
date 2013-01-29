@@ -10,6 +10,8 @@ import org.mozilla.javascript.ScriptableObject;
 import android.app.Service;
 import br.unisinos.swe.agentjs.engine.api.AgentAPI;
 import br.unisinos.swe.agentjs.engine.api.AgentNotification;
+import br.unisinos.swe.agentjs.engine.ctx.ContextUploader;
+import br.unisinos.swe.agentjs.engine.ctx.IContextUploader;
 import br.unisinos.swe.agentjs.engine.db.AgentScript;
 import br.unisinos.swe.agentjs.engine.db.AgentScriptManager;
 import br.unisinos.swe.agentjs.engine.db.IAgentChangeEvent;
@@ -46,6 +48,7 @@ public class Engine {
 		// initiate components
 		_components.add((ISignalsManager)new SignalsManager());
 		_components.add((IAgentScriptManager)new AgentScriptManager(new UPnPHandler(engineService)));
+		_components.add((IContextUploader)new ContextUploader(this));
 		
 		// define global signal manager
 		EngineContext.setSignalManager(get(ISignalsManager.class));
@@ -64,6 +67,10 @@ public class Engine {
 			}
 		}
 		return null;
+	}
+
+	public <U> U getComponent(Class<U> clsType) { // expose components
+		return get(clsType);
 	}
 
 	public void start() {

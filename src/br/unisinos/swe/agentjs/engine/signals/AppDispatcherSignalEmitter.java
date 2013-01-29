@@ -13,6 +13,8 @@ public class AppDispatcherSignalEmitter extends AbstractSignalEmitter {
 	
 	private BroadcastReceiver _appDispatcherReceiver;
 	
+	private AppDispatcherSignalInfo _lastRunningApp = null;
+	
 	public static enum DispatcherSignal {
 		HOME_APP_STARTED("home:app:started");
 
@@ -56,6 +58,8 @@ public class AppDispatcherSignalEmitter extends AbstractSignalEmitter {
 				String execCount = broadcastIntent.getStringExtra("App.ExecutionCount");
 				AppDispatcherSignalInfo info = new AppDispatcherSignalInfo(title, packageName, Integer.parseInt(execCount));
 				
+				_lastRunningApp = info; // TODO: refactor this to apps polling method
+				
 				AppDispatcherSignalEmitter.this.fire(DispatcherSignal.HOME_APP_STARTED.toString(), info);
 			}
 		};
@@ -73,6 +77,10 @@ public class AppDispatcherSignalEmitter extends AbstractSignalEmitter {
 	@Override
 	public boolean filter(String signal, ISignalListener listener, Object...params) {
 		return true; // no filter available
+	}
+	
+	public AppDispatcherSignalInfo getLastRunningApp() {
+		return _lastRunningApp;
 	}
 
 }

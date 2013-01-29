@@ -1,5 +1,6 @@
 package br.unisinos.swe.agentjs.engine.signals.info;
 
+import org.json.JSONObject;
 import org.mozilla.javascript.annotations.JSGetter;
 
 import android.net.wifi.WifiInfo;
@@ -40,6 +41,11 @@ public class WifiSignalBasicInfo {
 				(ipAddress >> 8 & 0xff), 
 				(ipAddress >> 16 & 0xff),
 				(ipAddress >> 24 & 0xff));
+	}
+
+	public JSONObject toJson() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -1,5 +1,6 @@
 package br.unisinos.swe.agentjs.engine.signals.info;
 
+import org.json.JSONObject;
 import org.mozilla.javascript.annotations.JSGetter;
 
 public class AppDispatcherSignalInfo {
@@ -30,6 +31,11 @@ public class AppDispatcherSignalInfo {
 	@JSGetter("executionCount")
 	public int getExecutionCount() {
 		return _executionCount;
+	}
+
+	public JSONObject toJson() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
