@@ -14,6 +14,7 @@ import org.mozilla.javascript.ScriptableObject;
 import com.google.common.util.concurrent.FutureCallback;
 
 import br.unisinos.swe.agentjs.engine.api.AgentHttpClient;
+import br.unisinos.swe.agentjs.ui.util.MenuHandler;
 import br.unisinos.swe.http.utils.HttpQueue;
 import br.unisinos.swe.http.utils.HttpQueueManager;
 import br.unisinos.swe.http.utils.HttpQueueRequest;
@@ -24,6 +25,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TabHost;
@@ -61,6 +64,21 @@ public class AndroidAgentJSActivity extends TabActivity {
         
         tabHost.addTab(localAgentsTab);
         tabHost.addTab(networkAgentsTab);
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return MenuHandler.onCreateOptionsMenu(getMenuInflater(), menu);
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        
+        if(MenuHandler.onOptionsItemSelected(item, this)) {
+                return true;
+        } else {
+                return super.onOptionsItemSelected(item);
+        }
     }
     
 }

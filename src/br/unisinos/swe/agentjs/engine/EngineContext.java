@@ -4,13 +4,20 @@ package br.unisinos.swe.agentjs.engine;
 import br.unisinos.swe.agentjs.engine.signals.ISignalsManager;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 public class EngineContext {
+	public static final String USER_FILE = "UserLocalData";
+	private SharedPreferences _preferences = null;
+	
 	protected static EngineContext m_instance = null;
 	
 	protected ISignalsManager _signalsManager = null;
 	private Context _context;
 	private EngineLogger _logger;
+	
+	
+	
 
 	protected EngineContext(Context appContext) {
 		_context = appContext;
@@ -51,8 +58,15 @@ public class EngineContext {
 		return m_instance;
 	}
 
-	public String getCloudUrl() { //TODO: Change to Shared parameters
-		return "http://127.0.0.1:8080/";
+	public String getCloudUrl() {
+		return getPreferences().getString("cloud.url", "");
+	}
+
+	public SharedPreferences getPreferences() {
+		if(_preferences == null) {
+			_preferences = this.getContext().getSharedPreferences(USER_FILE, 0); 
+		}
+		return this._preferences; 
 	}
 
 }

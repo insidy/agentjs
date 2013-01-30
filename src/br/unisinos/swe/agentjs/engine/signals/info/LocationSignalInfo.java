@@ -1,7 +1,10 @@
 package br.unisinos.swe.agentjs.engine.signals.info;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.annotations.JSGetter;
+
+import br.unisinos.swe.agentjs.engine.EngineContext;
 
 import android.location.Location;
 
@@ -72,8 +75,22 @@ public class LocationSignalInfo {
 	}
 
 	public JSONObject toJson() {
-		// TODO Auto-generated method stub
-		return null;
+		JSONObject selfJson = new JSONObject();
+		
+		try {
+			selfJson.put("latitude", this.getLat());
+			selfJson.put("longitude", this.getLon());
+			selfJson.put("time", this.getTime());
+			selfJson.put("accuracy", this.getAccuracy());
+			selfJson.put("speed", this.getSpeed());
+			selfJson.put("altitude", this.getAltitude());
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+			EngineContext.log().error("Error creating json object of Wifi Info");
+		}
+		
+		return selfJson;
 	}
 
 }

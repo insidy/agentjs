@@ -2,6 +2,7 @@
 <resources>
 
     <string name="hello">Hello World, AndroidAgentJSActivity!</string>
-    <string name="app_name">AndroidAgentJS</string>
+    <string name="app_name">AgentJS</string>
+    <string name="config">Preferências</string>
 
 </resources>

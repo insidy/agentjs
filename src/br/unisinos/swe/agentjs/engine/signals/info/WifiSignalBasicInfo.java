@@ -1,10 +1,15 @@
 package br.unisinos.swe.agentjs.engine.signals.info;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.annotations.JSGetter;
 
+import br.unisinos.swe.agentjs.engine.EngineContext;
+
+import android.annotation.SuppressLint;
 import android.net.wifi.WifiInfo;
 
+@SuppressLint("DefaultLocale")
 public class WifiSignalBasicInfo {
 
 	private WifiInfo _wifiInfo;
@@ -44,8 +49,20 @@ public class WifiSignalBasicInfo {
 	}
 
 	public JSONObject toJson() {
-		// TODO Auto-generated method stub
-		return null;
+		JSONObject selfJson = new JSONObject();
+		
+		try {
+			selfJson.put("ssid", this.getSSID());
+			selfJson.put("rssi", this.getRssi());
+			selfJson.put("linkSpeed", this.getLinkSpeed());
+			selfJson.put("ip", this.getIp());
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+			EngineContext.log().error("Error creating json object of Wifi Info");
+		}
+		
+		return selfJson;
 	}
 
 }

@@ -14,6 +14,8 @@ import br.unisinos.swe.agentjs.engine.signals.NetworkSignalEmitter;
 import br.unisinos.swe.agentjs.engine.signals.info.AppDispatcherSignalInfo;
 import br.unisinos.swe.agentjs.engine.signals.info.DeviceInfo;
 import br.unisinos.swe.agentjs.engine.signals.info.LocationSignalInfo;
+import br.unisinos.swe.agentjs.engine.signals.info.NetworkSignalBasicInfo;
+import br.unisinos.swe.agentjs.engine.signals.info.UserInfo;
 import br.unisinos.swe.agentjs.engine.signals.info.WifiSignalBasicInfo;
 import br.unisinos.swe.http.utils.HttpQueue;
 import br.unisinos.swe.http.utils.HttpQueueManager;
@@ -72,7 +74,7 @@ public class ContextUploader implements IContextUploader {
 		LocationSignalInfo whereAmI = this.getLocation(); // Where?
 		
 		// get current user data
-		String userId = this.getCurrentUser(); // Who?
+		UserInfo userInfo = this.getCurrentUser(); // Who?
 		
 		// get device info
 		DeviceInfo device = this.getDeviceInfo();
@@ -82,33 +84,30 @@ public class ContextUploader implements IContextUploader {
 		
 		// get connected network
 		WifiSignalBasicInfo wifiInfo = this.getWifiInfo();
+		NetworkSignalBasicInfo networkInfo = this.getNetworkInfo();
+		
 		
 		// do Json object conversion
-		String jsonString = this.createJsonPackage(whereAmI, userId, device, runningApp, wifiInfo);
-		
-		// send post to HttpQueue
-		HttpQueueRequest request = new HttpQueueRequest("POST", EngineContext.instance().getCloudUrl(), jsonString, null);
-		_httpQueue.fireEnsureDelivery(request);
-	}
-	
-	private String createJsonPackage(LocationSignalInfo whereAmI,
-			String userId, DeviceInfo device,
-			AppDispatcherSignalInfo runningApp, WifiSignalBasicInfo wifiInfo) {
-		
 		JSONObject jsonPackage = new JSONObject();
 		
 		try {
+			jsonPackage.put("timestamp", timestamp);
 			jsonPackage.put("location", whereAmI.toJson());
-			jsonPackage.put("user", userId);
+			jsonPackage.put("user", userInfo.toJson());
 			jsonPackage.put("device", device.toJson());
 			jsonPackage.put("app", runningApp.toJson());
 			jsonPackage.put("wifi", wifiInfo.toJson());
+			jsonPackage.put("network", networkInfo.toJson());
 		} catch (JSONException e) {
 			e.printStackTrace();
 			EngineContext.log().error("Error creating jsonPackage");
 		}
 		
-		return jsonPackage.toString();
+		String jsonString = jsonPackage.toString();
+		
+		// send post to HttpQueue
+		HttpQueueRequest request = new HttpQueueRequest("POST", EngineContext.instance().getCloudUrl(), jsonString, null);
+		_httpQueue.fireEnsureDelivery(request);
 	}
 
 	private WifiSignalBasicInfo getWifiInfo() {
@@ -117,9 +116,13 @@ public class ContextUploader implements IContextUploader {
 		return network.getWifiInfo();
 	}
 
+	private NetworkSignalBasicInfo getNetworkInfo() {
+		NetworkSignalEmitter network = _signalManager.get(NetworkSignalEmitter.class);
+		
+		return network.getNetworkInfo();
+	}
 	private DeviceInfo getDeviceInfo() {
-		// TODO Auto-generated method stub
-		return null;
+		return new DeviceInfo();
 	}
 
 	private AppDispatcherSignalInfo getRunningApp() {
@@ -127,9 +130,8 @@ public class ContextUploader implements IContextUploader {
 		return apps.getLastRunningApp();
 	}
 
-	private String getCurrentUser() {
-		// TODO Auto-generated method stub
-		return null;
+	private UserInfo getCurrentUser() {
+		return new UserInfo();
 	}
 
 	private LocationSignalInfo getLocation() { // last known location or async?

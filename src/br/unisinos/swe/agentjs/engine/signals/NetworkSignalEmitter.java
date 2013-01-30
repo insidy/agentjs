@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
@@ -44,6 +45,7 @@ public class NetworkSignalEmitter extends AbstractSignalEmitter {
 	private BroadcastReceiver _networkStateChangedReceiver;
 	private BroadcastReceiver _wifiStateChangedReceiver;
 	private WifiManager _wifiManager;
+	private ConnectivityManager _connectivityManager;
 	
 	public NetworkSignalEmitter() {
 		super();
@@ -64,6 +66,9 @@ public class NetworkSignalEmitter extends AbstractSignalEmitter {
 		// create listeners
 		this._wifiManager = ((WifiManager) EngineContext.instance()
 				.getContext().getSystemService(Context.WIFI_SERVICE));
+		
+		this._connectivityManager = ((ConnectivityManager)EngineContext.instance()
+				.getContext().getSystemService(Context.CONNECTIVITY_SERVICE));
 		
 		IntentFilter scanResultFilter = new IntentFilter();
 		scanResultFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
@@ -153,6 +158,10 @@ public class NetworkSignalEmitter extends AbstractSignalEmitter {
 	
 	public WifiSignalBasicInfo getWifiInfo() {
 		return new WifiSignalBasicInfo(_wifiManager.getConnectionInfo());
+	}
+	
+	public NetworkSignalBasicInfo getNetworkInfo() {
+		return new NetworkSignalBasicInfo(_connectivityManager.getActiveNetworkInfo());
 	}
 
 }
