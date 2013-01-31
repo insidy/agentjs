@@ -4,31 +4,31 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="15" />
-    <uses-permission android:name="android.permission.INTERNET" /> 
+    <uses-sdk
+        android:minSdkVersion="10"
+        android:targetSdkVersion="15" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.SEND_SMS"/>
-    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
+        android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:allowBackup="true" >
-        
-        <service android:name="org.teleal.cling.android.AndroidUpnpServiceImpl"/>
-        
-        <service 
-            android:name=".EngineService" />
-        
-        
+        android:label="@string/app_name" >
+        <service android:name="org.teleal.cling.android.AndroidUpnpServiceImpl" />
+        <service android:name=".EngineService" />
+
         <activity android:name=".LocalAgentsActivity" />
         <activity android:name=".NetworkAgentsActivity" />
-        
+        <activity android:name=".ui.ConfigActivity" />
         <activity
             android:name=".AndroidAgentJSActivity"
             android:label="@string/app_name" >
@@ -38,6 +38,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".engine.ctx.ContextUploader.ContextPolling" />
+        <receiver android:name=".engine.signals.BatterySignalEmitter.BatteryPolling" />
     </application>
 
 </manifest>

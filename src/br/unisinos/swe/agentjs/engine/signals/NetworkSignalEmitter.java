@@ -157,11 +157,25 @@ public class NetworkSignalEmitter extends AbstractSignalEmitter {
 	}
 	
 	public WifiSignalBasicInfo getWifiInfo() {
-		return new WifiSignalBasicInfo(_wifiManager.getConnectionInfo());
+		
+		WifiSignalBasicInfo wifiInfo = null;
+		WifiInfo currentWifi = _wifiManager.getConnectionInfo();
+		if(currentWifi != null) {
+			wifiInfo =  new WifiSignalBasicInfo(currentWifi);
+		}
+		
+		return wifiInfo;
 	}
 	
 	public NetworkSignalBasicInfo getNetworkInfo() {
-		return new NetworkSignalBasicInfo(_connectivityManager.getActiveNetworkInfo());
+		NetworkSignalBasicInfo networkInfo = null;
+		
+		NetworkInfo currentNetwork = _connectivityManager.getActiveNetworkInfo();
+		if(currentNetwork != null) {
+			networkInfo = new NetworkSignalBasicInfo(currentNetwork);
+		}
+		
+		return networkInfo;
 	}
 
 }

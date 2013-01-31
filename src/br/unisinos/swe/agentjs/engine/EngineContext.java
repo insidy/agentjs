@@ -5,6 +5,7 @@ import br.unisinos.swe.agentjs.engine.signals.ISignalsManager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 public class EngineContext {
 	public static final String USER_FILE = "UserLocalData";
@@ -64,7 +65,7 @@ public class EngineContext {
 
 	public SharedPreferences getPreferences() {
 		if(_preferences == null) {
-			_preferences = this.getContext().getSharedPreferences(USER_FILE, 0); 
+			_preferences = PreferenceManager.getDefaultSharedPreferences(this.getContext());//getSharedPreferences(USER_FILE, 0); 
 		}
 		return this._preferences; 
 	}

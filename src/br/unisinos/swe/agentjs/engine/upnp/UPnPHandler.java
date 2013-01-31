@@ -154,6 +154,10 @@ public class UPnPHandler extends DefaultRegistryListener implements IAgentUPnPHa
     	
 		if(_upnpService != null) {
 			Service service = wrapper.getDevice().findService(upnpAgentService);
+			if(service == null) {
+				EngineContext.log().error("Agent JS action not found for " + wrapper.getDevice().getDisplayString());
+				return;
+			}
 			Action getAgentListAction = service.getAction("GetAgentList");
 			if(getAgentListAction == null) {
 				EngineContext.log().error("Agent list action not found");

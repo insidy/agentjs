@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Preference xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     
     <PreferenceCategory android:title="Informações de conectividade">          
-          <!-- <EditTextPreference 
-                android:title="Identificador do Facebook"
-                android:key="user.facebook.id"
-                android:summary="ID"
-                android:dialogTitle="Informe seu id no facebook"
-                android:defaultValue="100000579436195"
-                android:inputType="number"/>  -->
           
            <EditTextPreference 
                 android:title="Nome no Facebook"
@@ -23,10 +16,10 @@
                 android:key="cloud.url"
                 android:summary="URL"
                 android:dialogTitle="Informe a URL do serviço"
-                android:defaultValue="http://127.0.0.1:8080/"
+                android:defaultValue=""
                 android:inputType="textUri"/>
           
  
   </PreferenceCategory>
 
-</Preference>
+</PreferenceScreen>

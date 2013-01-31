@@ -14,12 +14,15 @@ import android.content.IntentFilter;
 import android.os.SystemClock;
 
 public class BatterySignalEmitter extends AbstractSignalEmitter {
+	private static final String BATTERY_CHANGE = "br.unisinos.swe.agentjs.engine.signal.BATTERY_CHANGE";
+	
 	private AlarmManager _polling;
 	private PendingIntent _operation;
 	private BroadcastReceiver _batteryStatusLowReceiver = null;
 	private BroadcastReceiver _batteryStatusOkayReceiver;
 	private BroadcastReceiver _batteryAcOnReceiver;
 	private BroadcastReceiver _batteryAcOffReceiver;
+	private BatteryPolling _bateryChangeReceiver;
 	
 	public static enum BatterySignal {
 		BATTERY_INFO("battery:info"), BATTERY_LOW("battery:low"), BATTERY_OKAY("battery:ok"), BATTERY_POWER_ON("power:connected"), BATTERY_POWER_OFF("power:disconnected");
@@ -35,7 +38,7 @@ public class BatterySignalEmitter extends AbstractSignalEmitter {
 		}
 	}
 	
-	protected class BatteryPolling extends BroadcastReceiver { 
+	public class BatteryPolling extends BroadcastReceiver { 
 	     private IntentFilter _batteryStatusFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 	     protected BatterySignalInfo previousInfo = null; 
 	     
@@ -74,11 +77,13 @@ public class BatterySignalEmitter extends AbstractSignalEmitter {
 		
 		_polling = (AlarmManager)EngineContext.instance().getContext().getSystemService(Context.ALARM_SERVICE);
 		
-		Intent i = new Intent(EngineContext.instance().getContext(), BatteryPolling.class);
+		Intent i = new Intent(BATTERY_CHANGE);
 		_operation = PendingIntent.getBroadcast(EngineContext.instance().getContext(), 0, i, 0);
 
 		_polling.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), AlarmManager.INTERVAL_HALF_HOUR, _operation);
 		
+		IntentFilter batteryChangeFilter = new IntentFilter(BATTERY_CHANGE);
+		_bateryChangeReceiver = new BatteryPolling();
 		
 		
 		IntentFilter batteryStatusLowFilter = new IntentFilter(Intent.ACTION_BATTERY_LOW);
@@ -118,6 +123,7 @@ public class BatterySignalEmitter extends AbstractSignalEmitter {
 		};
 		
 		
+		EngineContext.instance().getContext().registerReceiver(this._bateryChangeReceiver, batteryChangeFilter);
 		EngineContext.instance().getContext().registerReceiver(this._batteryStatusOkayReceiver, batteryStatusOkayFilter);
 		EngineContext.instance().getContext().registerReceiver(this._batteryStatusLowReceiver, batteryStatusLowFilter);
 		EngineContext.instance().getContext().registerReceiver(this._batteryAcOnReceiver, batteryAcOnFilter);
@@ -129,11 +135,17 @@ public class BatterySignalEmitter extends AbstractSignalEmitter {
 
 	@Override
 	public void stop() {
+		try {
 		_polling.cancel(_operation);
+		EngineContext.instance().getContext().unregisterReceiver(this._bateryChangeReceiver);
 		EngineContext.instance().getContext().unregisterReceiver(this._batteryStatusOkayReceiver);
 		EngineContext.instance().getContext().unregisterReceiver(this._batteryStatusLowReceiver);
 		EngineContext.instance().getContext().unregisterReceiver(this._batteryAcOnReceiver);
 		EngineContext.instance().getContext().unregisterReceiver(this._batteryAcOffReceiver);
+		} catch(Exception e) {
+			EngineContext.log().error("Unable to completely stop Battery Signal");
+			e.printStackTrace();
+		}
 	}
 
 	@Override
