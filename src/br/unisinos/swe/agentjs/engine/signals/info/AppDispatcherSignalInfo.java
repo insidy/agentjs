@@ -10,6 +10,7 @@ public class AppDispatcherSignalInfo {
 	private String _title;
 	private String _packageName;
 	private int _executionCount;
+	private int _importance;
 	
 	public AppDispatcherSignalInfo() {
 		
@@ -19,6 +20,14 @@ public class AppDispatcherSignalInfo {
 		_title = title;
 		_packageName = packageName;
 		_executionCount = execCount;
+		_importance = 0;
+	}
+	
+	public AppDispatcherSignalInfo(String title, String packageName, int execCount, int importance) {
+		_title = title;
+		_packageName = packageName;
+		_executionCount = execCount;
+		_importance = importance;
 	}
 	
 	@JSGetter("title")
@@ -35,13 +44,22 @@ public class AppDispatcherSignalInfo {
 	public int getExecutionCount() {
 		return _executionCount;
 	}
+	
+	public int getImportance() {
+		return _importance;
+	}
 
 	public JSONObject toJson() {
 		JSONObject selfJson = new JSONObject();
 		
 		try {
-			selfJson.put("title", this.getTitle());
-			selfJson.put("packageName", this.getPackageName());
+			String title = this.getTitle();
+			if(title == null) {
+				title = "";
+			}
+			
+			selfJson.put("name", title);
+			selfJson.put("pack", this.getPackageName());
 			
 		} catch (JSONException e) {
 			e.printStackTrace();

@@ -86,6 +86,10 @@ public class UserInfo {
 		return this._facebookId;
 	}
 	
+	public String getFacebookName() {
+		return this._facebookName;
+	}
+	
 	public String getGender() {
 		return this._gender;
 	}

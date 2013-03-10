@@ -1,12 +1,14 @@
 package br.unisinos.swe.agentjs.engine.signals;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeObject;
 
+import android.net.wifi.ScanResult;
 import br.unisinos.swe.agentjs.engine.AgentExecutorHelper;
 
 public class SignalListener implements ISignalListener {
@@ -44,7 +46,21 @@ public class SignalListener implements ISignalListener {
 		Object[] jsParams = new Object[params.length];
 		
 		for(int idx = 0; idx < params.length; idx++) {
-			jsParams[idx] = _helper.javaToJS(params[idx]);
+			if(params[idx] instanceof List) {
+				List listParam = (List)params[idx];
+				
+				Object[] jsArray = new Object[listParam.size()];
+				
+				int n = 0;
+				for(Object objParam : listParam) {
+					jsArray[n++] = _helper.javaToJS(objParam); 
+				}
+				
+				jsParams[idx] = _helper.newArray(jsArray);
+				
+			} else {
+				jsParams[idx] = _helper.javaToJS(params[idx]);
+			}
 		}
 		
 		_helper.callback(_callback, jsParams);

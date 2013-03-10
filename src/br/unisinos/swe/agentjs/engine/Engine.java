@@ -123,6 +123,10 @@ public class Engine {
 	public void removeAgentListener(IAgentChangeEvent eventListener) {
 		get(IAgentScriptManager.class).removeListener(eventListener);
 	}
+
+	public void refreshFromWeb() {
+		get(IAgentScriptManager.class).refreshFromWeb();
+	}
 	
 	/*
 	private void loadLocalScripts(Context rhino, Scriptable scope) {

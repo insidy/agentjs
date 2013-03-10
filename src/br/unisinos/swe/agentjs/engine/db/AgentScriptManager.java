@@ -10,13 +10,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.ParseException;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.google.common.util.concurrent.FutureCallback;
+
 import br.unisinos.swe.agentjs.engine.AgentExecutor;
 import br.unisinos.swe.agentjs.engine.Engine;
 import br.unisinos.swe.agentjs.engine.EngineContext;
 import br.unisinos.swe.agentjs.engine.IAgentScriptManager;
+import br.unisinos.swe.agentjs.engine.signals.info.UserInfo;
 import br.unisinos.swe.agentjs.engine.upnp.DeviceWrapper;
 import br.unisinos.swe.agentjs.engine.upnp.IAgentUPnPListener;
 import br.unisinos.swe.agentjs.engine.upnp.IAgentUPnPHandler;
+import br.unisinos.swe.http.utils.HttpQueue;
+import br.unisinos.swe.http.utils.HttpQueueManager;
+import br.unisinos.swe.http.utils.HttpQueueRequest;
 
 import android.annotation.SuppressLint;
 import android.os.Environment;
@@ -34,7 +48,10 @@ public class AgentScriptManager implements IAgentUPnPListener, IAgentScriptManag
 	
 	private List<IAgentChangeEvent> _agentStateListeners; // inform them about any changes in agent list
 
+	private HttpQueue _httpQueue;
+	
 	public AgentScriptManager(IAgentUPnPHandler upnp) {
+		_httpQueue = HttpQueueManager.create();
 		_upnp = upnp;
 		
 		_localScripts = new ArrayList<AgentScript>();
@@ -58,6 +75,20 @@ public class AgentScriptManager implements IAgentUPnPListener, IAgentScriptManag
 		}
 
 		return _localScripts;
+	}
+	
+	protected void updateLocalScripts(List<AgentScript> webScripts) {
+		for(AgentScript script : webScripts) {
+			if(_localScripts.contains(script)) {
+				int index = _localScripts.indexOf(script);
+				AgentScript currentScript = _localScripts.get(index);
+				currentScript.setSourceCode(script.getSourceCode());
+				this.informChangeAgent(currentScript);
+			} else {
+				_localScripts.add(script);
+				this.informAddAgent(script);
+			}
+		}
 	}
 
 	private ArrayList<AgentScript> lookupAgentsInFolder() {
@@ -263,6 +294,54 @@ public class AgentScriptManager implements IAgentUPnPListener, IAgentScriptManag
 	@Override
 	public void removeListener(IAgentChangeEvent listener) {
 		_agentStateListeners.remove(listener);
+	}
+
+	@Override
+	public void refreshFromWeb() {
+		
+		
+		String ctxUrl = EngineContext.instance().getCloudUrl() + "rest/agent/" + (new UserInfo()).getFacebookName();
+		HttpQueueRequest request = new HttpQueueRequest("GET", ctxUrl, null, new FutureCallback<HttpEntity>() {
+			
+			@Override
+			public void onSuccess(HttpEntity response) {
+				try {
+					String jsonResponse = EntityUtils.toString(response);
+					
+					JSONObject jsRootObject = new JSONObject(jsonResponse);
+					JSONArray jsArray = new JSONArray();
+					try {
+						jsArray = jsRootObject.getJSONArray("agentJson");
+					} catch(JSONException ex) {
+						JSONObject jsAgentJson = jsRootObject.getJSONObject("agentJson");
+						jsArray.put(jsAgentJson);
+					}
+					
+					List<AgentScript> scripts = new ArrayList<AgentScript>();
+					
+					for(int i = 0; i < jsArray.length(); i++) {
+						JSONObject jsAgentObject = jsArray.getJSONObject(i);
+						scripts.add(new AgentScript(jsAgentObject));
+					}
+					
+					updateLocalScripts(scripts);
+					
+				} catch (ParseException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable arg0) {
+				
+			}
+		});
+		request.setHeader("Content-Type", "application/json");
+		_httpQueue.fireEnsureCallback(request);
 	}
 
 }

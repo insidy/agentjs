@@ -1,6 +1,8 @@
 package br.unisinos.swe.http.utils;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -25,6 +27,7 @@ public class HttpQueueRequest {
 	protected String _method;
 	protected String _url;
 	protected String _content;
+	protected HashMap<String, String> _headers;
 	protected FutureCallback<HttpEntity> _callback;
 	
 	public HttpQueueRequest(String method, String url, String content, FutureCallback<HttpEntity> callback) {
@@ -32,6 +35,15 @@ public class HttpQueueRequest {
 		_url = url;
 		_content = content;
 		_callback = callback;
+		_headers = new HashMap<String, String>();
+	}
+	
+	public void setHeader(String key, String value) {
+		_headers.put(key, value);
+	}
+	
+	public HashMap<String, String> getHeaders() {
+		return _headers;
 	}
 	
 	public HttpRequest getUriRequest() {

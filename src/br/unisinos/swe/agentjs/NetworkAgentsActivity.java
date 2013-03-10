@@ -20,9 +20,19 @@ public class NetworkAgentsActivity extends Activity {
         final ExpandableListView listView = (ExpandableListView) findViewById(R.id.localAgentsExpandable);
         
         _adapter = new AgentsExapandableListAdapter(this, AgentScriptLocation.NETWORK);
-
+        
         // Set this blank adapter to the list view
         listView.setAdapter(_adapter);
+        
+        listView.setOnGroupClickListener(new OnGroupClickListener() {
+			
+			@Override
+			public boolean onGroupClick(ExpandableListView parent, View v,
+					int groupPosition, long id) {
+				_adapter.startAgent(groupPosition);
+				return true;
+			}
+		});
         
     }
 }

@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class AgentsExapandableListAdapter extends BaseExpandableListAdapter implements IAgentChangeEvent {
@@ -74,15 +75,16 @@ public class AgentsExapandableListAdapter extends BaseExpandableListAdapter impl
 			@Override
 			public void onClick(View view) {
 				Button btn = (Button)view.findViewById(R.id.btnStart);
-				btn.setEnabled(false);
+				btn.setEnabled(true);
 				startAgent(agentPosition);
 			}
 		});
-		if(scriptView.isRunning()) {
-			btnStart.setEnabled(false);
-		} else {
-			btnStart.setEnabled(true);
-		}
+		
+		//if(scriptView.isRunning()) {
+		//	btnStart.setEnabled(false);
+		//} else {
+		//	btnStart.setEnabled(true);
+		//}
 		
 		convertView.setFocusableInTouchMode(true);
 		
@@ -110,7 +112,7 @@ public class AgentsExapandableListAdapter extends BaseExpandableListAdapter impl
 		return groupPosition;
 	}
 	
-	private final void startAgent(int agentPosition) {
+	public final void startAgent(int agentPosition) {
 		AgentScriptView scriptView = (AgentScriptView) getGroup(agentPosition);
 		_engine.getEngine().startScript(scriptView.getScript());
 	}
@@ -130,6 +132,7 @@ public class AgentsExapandableListAdapter extends BaseExpandableListAdapter impl
 		
 		txtAgentName.setText(scriptView.getName());
 		chkAgentRunning.setChecked(scriptView.isRunning());
+		
 		
 		return convertView;
 	}
@@ -159,6 +162,7 @@ public class AgentsExapandableListAdapter extends BaseExpandableListAdapter impl
             switch(_type) {
             case OWN:
             	availableScripts = _engine.getEngine().getLocalScripts();
+            	_engine.getEngine().registerAgentListener(AgentsExapandableListAdapter.this);
             	break;
             case NETWORK:
             	availableScripts = _engine.getEngine().getNetworkScripts();
@@ -184,38 +188,49 @@ public class AgentsExapandableListAdapter extends BaseExpandableListAdapter impl
 
 	@Override
 	public void addAgent(AgentScript script) {
-		_scripts.add(new AgentScriptView(script));
-		_parentActivity.runOnUiThread(new Runnable() {
-			
-			@Override
-			public void run() {
-				notifyDataSetChanged();
-			}
-		});
+		if(script.getType().equals(this._type)) {
+		
+			_scripts.add(new AgentScriptView(script));
+			_parentActivity.runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					notifyDataSetChanged();
+				}
+			});
+		}
 		
 	}
 
 	@Override
 	public void removeAgent(AgentScript script) {
-		_scripts.remove(new AgentScriptView(script));
-		_parentActivity.runOnUiThread(new Runnable() {
-			
-			@Override
-			public void run() {
-				notifyDataSetChanged();
-			}
-		});
+		if(script.getType().equals(this._type)) {
+			_scripts.remove(new AgentScriptView(script));
+			_parentActivity.runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					notifyDataSetChanged();
+				}
+			});
+		}
 	}
 
 	@Override
 	public void agentStateChanged(AgentScript script) {
-		_parentActivity.runOnUiThread(new Runnable() {
-			
-			@Override
-			public void run() {
-				notifyDataSetChanged();
-			}
-		});
+		if(script.getType().equals(this._type)) {
+			_parentActivity.runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					notifyDataSetChanged();
+				}
+			});
+		}
+	}
+
+	public void retrieveFromWeb() {
+		_engine.getEngine().refreshFromWeb();
 	}
 
 }

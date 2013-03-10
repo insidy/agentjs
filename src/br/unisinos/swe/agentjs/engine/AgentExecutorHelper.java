@@ -50,9 +50,13 @@ public class AgentExecutorHelper {
 		}
 	}
 
-	public Object javaToJS(Object toConvert) {
-		EngineScriptSandbox.SandboxClassShutter.addAllowedScriptableComponent(toConvert.getClass()); // TODO: If we are converting, we want to expose, right?		
-		return Context.javaToJS(toConvert, _scope);
+	public Object javaToJS(Object toConvert) { // TODO: If we are converting, we want to expose, right?
+		if(toConvert == null) {
+			return null;
+		} else {
+			EngineScriptSandbox.SandboxClassShutter.addAllowedScriptableComponent(toConvert.getClass()); 		
+			return Context.javaToJS(toConvert, _scope);
+		}
 	}
 	
 	public Scriptable newArray(Object[] elements) {

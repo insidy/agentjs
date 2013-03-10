@@ -1,5 +1,6 @@
 package br.unisinos.swe.agentjs.ui.util;
 
+import br.unisinos.swe.agentjs.AndroidAgentJSActivity;
 import br.unisinos.swe.agentjs.R;
 import br.unisinos.swe.agentjs.ui.ConfigActivity;
 import android.app.Activity;
@@ -14,7 +15,7 @@ public class MenuHandler {
 		return true;
 	}
 
-	public static boolean onOptionsItemSelected(MenuItem item, Activity parent) {
+	public static boolean onOptionsItemSelected(MenuItem item, AndroidAgentJSActivity parent) {
 
 		try {
 			switch (item.getItemId()) {
@@ -22,6 +23,9 @@ public class MenuHandler {
 				Intent settingsActivity = new Intent(
 						parent.getApplicationContext(), ConfigActivity.class);
 				parent.startActivity(settingsActivity);
+				return true;
+			case R.id.refresh_agents:
+				parent.refreshAgents();
 				return true;
 			}
 		} catch (Exception e) {

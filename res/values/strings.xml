@@ -4,5 +4,6 @@
     <string name="hello">Hello World, AndroidAgentJSActivity!</string>
     <string name="app_name">AgentJS</string>
     <string name="config">Preferências</string>
+    <string name="refresh_agents">Atualizar Agentes</string>
 
 </resources>

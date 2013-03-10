@@ -106,6 +106,19 @@ public class LocationSignalEmitter extends AbstractSignalEmitter {
 		}
 		return locationInfo;
 	}
+	
+	public void getCurrentLocation(LocationListener listener) {
+		Criteria criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+		criteria.setAltitudeRequired(false);
+		criteria.setBearingRequired(false);
+		criteria.setCostAllowed(true);
+		criteria.setPowerRequirement(Criteria.POWER_LOW);
+
+		_bestProvider = _locationManager.getBestProvider(criteria, false);
+		_locationManager.requestSingleUpdate(criteria, listener, Looper.getMainLooper());
+		
+	}
 
 	private boolean isRegionBased(String signalString) {
 

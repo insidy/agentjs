@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
@@ -16,7 +17,9 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import br.unisinos.swe.agentjs.engine.EngineContext;
 import br.unisinos.swe.agentjs.engine.signals.info.NetworkSignalBasicInfo;
+import br.unisinos.swe.agentjs.engine.signals.info.ScanResultInfo;
 import br.unisinos.swe.agentjs.engine.signals.info.WifiSignalBasicInfo;
+import br.unisinos.swe.agentjs.engine.wrappers.ApplicationInfoWrapper;
 
 public class NetworkSignalEmitter extends AbstractSignalEmitter {
 
@@ -76,11 +79,12 @@ public class NetworkSignalEmitter extends AbstractSignalEmitter {
 
 			@Override
 			public void onReceive(Context appContext, Intent broadcastIntent) {
-				List<ScanResult> scanResults = _wifiManager.getScanResults(); // convert to NativeArray of ?
-				//TODO Implement object conversion
+				List<ScanResult> scanResults = _wifiManager.getScanResults();
 				
-				NativeArray array = new NativeArray(scanResults.toArray());
-				NetworkSignalEmitter.this.fire(NetworkSignal.WIFI_SCAN.toString(), array);
+				List<ScanResultInfo> scanWrappedResults = ScanResultInfo.fromScanResultList(scanResults);
+				
+				
+				NetworkSignalEmitter.this.fire(NetworkSignal.WIFI_SCAN.toString(), scanWrappedResults);
 
 			}
 		};

@@ -144,10 +144,11 @@ public class ContextUploader implements IContextUploader {
 		
 		
 		// send post to HttpQueue
-		String ctxUrl = EngineContext.instance().getCloudUrl() + "j/context";
+		String ctxUrl = EngineContext.instance().getCloudUrl() + "rest/context";
 		
 		EngineContext.log().info("Uploading context to cloud: " + ctxUrl);
 		HttpQueueRequest request = new HttpQueueRequest("POST", ctxUrl, jsonString, null);
+		request.setHeader("Content-Type", "application/json");
 		_httpQueue.fireEnsureDelivery(request);
 	}
 

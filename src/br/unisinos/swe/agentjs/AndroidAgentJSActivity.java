@@ -80,5 +80,11 @@ public class AndroidAgentJSActivity extends TabActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+	public void refreshAgents() {
+		Intent intent = new Intent("br.unisinos.swe.agentjs.refresh");
+		intent.setAction("br.unisinos.swe.agentjs.refresh");
+		sendBroadcast(intent);
+	}
     
 }

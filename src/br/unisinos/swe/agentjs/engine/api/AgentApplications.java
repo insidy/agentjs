@@ -27,6 +27,11 @@ public class AgentApplications extends AbstractAgentAPIComponent {
 	}
 
 	@JSFunction("launchAppForUrl")
+	public void launchAppForUrl(String url) {
+		this.launchAppForUrl(url, null);
+	}
+	
+	@JSFunction("launchAppForUrl")
 	public void launchAppForUrl(String url, String mime) {
 		
 		String adjustedMime = mime;

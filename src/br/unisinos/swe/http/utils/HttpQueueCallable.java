@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.concurrent.Callable;
 
 import org.apache.http.HttpEntity;
@@ -68,6 +69,13 @@ public class HttpQueueCallable implements Callable<HttpEntity> {
 		try {
 			url = new URL(_request.getUrl());
 			urlConnection = (HttpURLConnection) url.openConnection();
+			
+			// define headers
+			HashMap<String, String> headers = _request.getHeaders();
+			for(String key : headers.keySet()) {
+				urlConnection.setRequestProperty(key, headers.get(key));
+			}
+			
 			urlConnection.setRequestMethod(_request.getMethod());
 			if(_request.getContent() != null) {
 				byte[] outData = _request.getContent().getBytes();

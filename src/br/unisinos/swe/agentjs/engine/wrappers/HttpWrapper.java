@@ -1,6 +1,11 @@
 package br.unisinos.swe.agentjs.engine.wrappers;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -12,6 +17,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.EntityEnclosingRequestWrapper;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.ByteStreams;
 
 import br.unisinos.swe.agentjs.engine.EngineContext;
 import br.unisinos.swe.agentjs.engine.EngineUtils;
@@ -68,29 +76,40 @@ public class HttpWrapper extends AsyncTask<String, Void, HttpEntity> {
 		 */
 	}
 	
-	private final HttpEntity ajax(String method, String url, String content, IResponseHandler handler) {
-
+	private final HttpEntity ajax(String sMethod, String sUrl, String sContent, IResponseHandler handler) {
 		HttpEntity response = null;
+		
+		URL url = null; 
+		HttpURLConnection urlConnection = null;
+		
 		try {
-			EntityEnclosingRequestWrapper request = new EntityEnclosingRequestWrapper(new HttpPost(url));
-			request.setMethod(method);
+			url = new URL(sUrl);
+			urlConnection = (HttpURLConnection) url.openConnection();
 			
-			if(content != null) {
-				request.setEntity(new StringEntity(content));
+			urlConnection.setRequestMethod(sMethod);
+			if(sContent != null) {
+				byte[] outData = sContent.getBytes();
+				urlConnection.setDoOutput(true);
+				urlConnection.setRequestProperty("Content-Length", Integer.toString(outData.length));
+				urlConnection.setUseCaches(false);
+
+			    OutputStream out = urlConnection.getOutputStream();
+			    out.write(outData);
+			    out.close();
 			}
 			
+			BufferedInputStream in = new BufferedInputStream(urlConnection.getInputStream());
+			String strResponse = new String(ByteStreams.toByteArray(in),Charsets.UTF_8);
+			in.close();
 			
+			response = new StringEntity(strResponse);
 			
-			HttpResponse httpResponse = this._httpClient.execute(request);
-
-			response = httpResponse.getEntity();
-
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ProtocolException e) {
-			e.printStackTrace();
+		} catch(Exception e) {
+		
+		} finally {
+			if(urlConnection != null) {
+				urlConnection.disconnect();
+			}
 		}
 		
 		return response;
